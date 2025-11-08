@@ -16,25 +16,22 @@ export default function Header() {
   useEffect(() => {
     setMounted(true)
 
-    const loadUser = async () => {
+    const initializeHeader = async () => {
       const currentUser = await getCurrentUser()
       setUser(currentUser)
-    }
-    loadUser()
 
-    if (typeof window !== "undefined") {
-      const savedLocale = localStorage.getItem("locale") as Locale
-      if (savedLocale) {
-        setLocale(savedLocale)
+      const savedLocale = typeof window !== "undefined" ? localStorage.getItem("locale") : null
+      if (savedLocale && (savedLocale === "ko" || savedLocale === "en" || savedLocale === "ja")) {
+        setLocale(savedLocale as Locale)
       }
     }
 
+    initializeHeader()
+
     const handleLocaleChangeEvent = () => {
-      if (typeof window !== "undefined") {
-        const newLocale = localStorage.getItem("locale") as Locale
-        if (newLocale) {
-          setLocale(newLocale)
-        }
+      const newLocale = typeof window !== "undefined" ? localStorage.getItem("locale") : null
+      if (newLocale && (newLocale === "ko" || newLocale === "en" || newLocale === "ja")) {
+        setLocale(newLocale as Locale)
       }
     }
 

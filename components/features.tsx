@@ -10,15 +10,15 @@ export default function Features() {
 
   useEffect(() => {
     setMounted(true)
-    const savedLocale = (typeof window !== "undefined" && localStorage.getItem("locale")) as Locale
-    if (savedLocale) {
-      setLocale(savedLocale)
+    const savedLocale = typeof window !== "undefined" ? localStorage.getItem("locale") : null
+    if (savedLocale && (savedLocale === "ko" || savedLocale === "en" || savedLocale === "ja")) {
+      setLocale(savedLocale as Locale)
     }
 
     const handleLocaleChange = () => {
-      const newLocale = (typeof window !== "undefined" && localStorage.getItem("locale")) as Locale
-      if (newLocale) {
-        setLocale(newLocale)
+      const newLocale = typeof window !== "undefined" ? localStorage.getItem("locale") : null
+      if (newLocale && (newLocale === "ko" || newLocale === "en" || newLocale === "ja")) {
+        setLocale(newLocale as Locale)
       }
     }
 

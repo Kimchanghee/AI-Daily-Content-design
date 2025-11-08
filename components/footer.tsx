@@ -11,17 +11,17 @@ export default function Footer() {
     setMounted(true)
 
     if (typeof window !== "undefined") {
-      const savedLocale = localStorage.getItem("locale") as Locale
-      if (savedLocale) {
-        setLocale(savedLocale)
+      const savedLocale = localStorage.getItem("locale")
+      if (savedLocale === "ko" || savedLocale === "en" || savedLocale === "ja") {
+        setLocale(savedLocale as Locale)
       }
     }
 
     const handleLocaleChange = () => {
       if (typeof window !== "undefined") {
-        const newLocale = localStorage.getItem("locale") as Locale
-        if (newLocale) {
-          setLocale(newLocale)
+        const newLocale = localStorage.getItem("locale")
+        if (newLocale === "ko" || newLocale === "en" || newLocale === "ja") {
+          setLocale(newLocale as Locale)
         }
       }
     }
