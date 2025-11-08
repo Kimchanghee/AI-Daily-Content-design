@@ -12,6 +12,19 @@ export default function Hero() {
     if (savedLocale) {
       setLocale(savedLocale)
     }
+
+    const handleLocaleChange = () => {
+      const newLocale = localStorage.getItem("locale") as Locale
+      if (newLocale) {
+        setLocale(newLocale)
+      }
+    }
+
+    window.addEventListener("localeChange", handleLocaleChange)
+
+    return () => {
+      window.removeEventListener("localeChange", handleLocaleChange)
+    }
   }, [])
 
   const t = (key: keyof typeof import("@/lib/i18n").translations.ko) => getTranslation(locale, key)

@@ -24,6 +24,19 @@ export default function Header() {
     if (savedLocale) {
       setLocale(savedLocale)
     }
+
+    const handleLocaleChange = () => {
+      const newLocale = localStorage.getItem("locale") as Locale
+      if (newLocale) {
+        setLocale(newLocale)
+      }
+    }
+
+    window.addEventListener("localeChange", handleLocaleChange)
+
+    return () => {
+      window.removeEventListener("localeChange", handleLocaleChange)
+    }
   }, [])
 
   const handleLocaleChange = (newLocale: Locale) => {

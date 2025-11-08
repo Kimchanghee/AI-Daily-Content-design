@@ -56,6 +56,21 @@ export default function Pricing() {
     if (savedLocale) {
       setLocale(savedLocale)
     }
+
+    const handleLocaleChange = () => {
+      const newLocale = localStorage.getItem("locale") as Locale
+      if (newLocale) {
+        setLocale(newLocale)
+      }
+    }
+
+    window.addEventListener("storage", handleLocaleChange)
+    window.addEventListener("localeChange", handleLocaleChange)
+
+    return () => {
+      window.removeEventListener("storage", handleLocaleChange)
+      window.removeEventListener("localeChange", handleLocaleChange)
+    }
   }, [])
 
   const t = (key: keyof typeof import("@/lib/i18n").translations.ko) => getTranslation(locale, key)
@@ -83,31 +98,31 @@ export default function Pricing() {
           <p className="section-subtitle text-base sm:text-lg px-4">{t("pricingSubtitle")}</p>
         </div>
 
-        <div className="max-w-lg mx-auto px-2 sm:px-4">
+        <div className="max-w-md mx-auto px-2 sm:px-4">
           <Card className="border-2 border-accent bg-background/80 shadow-2xl ring-1 ring-accent/30 overflow-hidden">
-            <div className="bg-gradient-to-r from-primary to-accent text-accent-foreground px-4 py-2.5 sm:py-3 text-center font-semibold text-sm sm:text-base">
+            <div className="bg-gradient-to-r from-primary to-accent text-accent-foreground px-4 py-2 sm:py-2.5 text-center font-semibold text-sm">
               ⭐ {t("planName")}
             </div>
 
-            <CardHeader className="px-4 sm:px-6 pt-6 sm:pt-8">
-              <h3 className="mb-2 text-xl sm:text-2xl font-bold text-foreground">{t("planName")}</h3>
-              <p className="mb-4 text-sm text-muted-foreground leading-relaxed">{t("planDescription")}</p>
+            <CardHeader className="px-4 sm:px-5 pt-5 sm:pt-6">
+              <h3 className="mb-2 text-lg sm:text-xl font-bold text-foreground">{t("planName")}</h3>
+              <p className="mb-3 text-xs sm:text-sm text-muted-foreground leading-relaxed">{t("planDescription")}</p>
               <div className="flex items-baseline gap-1 mb-2">
-                <span className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground">₩19,800</span>
-                <span className="text-sm text-muted-foreground">{t("perMonth")}</span>
+                <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground">₩19,800</span>
+                <span className="text-xs sm:text-sm text-muted-foreground">{t("perMonth")}</span>
               </div>
             </CardHeader>
 
-            <CardContent className="space-y-6 px-4 sm:px-6 pb-6 sm:pb-8">
-              <Button className="w-full font-semibold text-base bg-gradient-to-r from-primary to-accent text-accent-foreground hover:opacity-90 transform hover:scale-105 transition-all min-h-[48px]">
+            <CardContent className="space-y-5 px-4 sm:px-5 pb-5 sm:pb-6">
+              <Button className="w-full font-semibold text-sm sm:text-base bg-gradient-to-r from-primary to-accent text-accent-foreground hover:opacity-90 transform hover:scale-105 transition-all min-h-[44px]">
                 {t("getStarted")} →
               </Button>
 
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 {features.map((feature) => (
-                  <div key={feature} className="flex items-start gap-3">
-                    <span className="text-accent text-lg sm:text-xl flex-shrink-0 mt-0.5">✓</span>
-                    <span className="text-sm sm:text-base text-foreground leading-relaxed">{feature}</span>
+                  <div key={feature} className="flex items-start gap-2.5">
+                    <span className="text-accent text-base sm:text-lg flex-shrink-0 mt-0.5">✓</span>
+                    <span className="text-xs sm:text-sm text-foreground leading-relaxed">{feature}</span>
                   </div>
                 ))}
               </div>

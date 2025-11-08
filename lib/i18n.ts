@@ -1,4 +1,4 @@
-export type Locale = "ko" | "en"
+export type Locale = "ko" | "en" | "ja"
 
 export const translations = {
   ko: {
@@ -177,6 +177,101 @@ export const translations = {
     api: "API",
     guides: "Guides",
     customerSupport: "Customer Support",
+  },
+  ja: {
+    // Header
+    features: "機能",
+    testimonials: "お客様の声",
+    pricing: "料金プラン",
+    contact: "お問い合わせ",
+    login: "ログイン",
+    dashboard: "ダッシュボード",
+    startFreeTrial: "無料トライアル",
+
+    // Hero
+    badge: "営業職のためのAIニュースサービス",
+    heroTitle1: "AIが作る画像ニュース",
+    heroTitle2: "顧客に直接配信",
+    heroDescription:
+      "営業職のための特別なサービス。AIが顧客に役立つ業界ニュースを画像で作成し、Telegramチャネルを通じて既存顧客や潜在顧客に自動配信します。",
+    start7DayTrial: "7日間無料トライアル",
+    viewIntro: "サービス紹介",
+    alreadyUsedBy: "多くの営業プロフェッショナルが使用中",
+
+    // User types
+    insurance: "保険営業",
+    realEstate: "不動産仲介",
+    finance: "金融アドバイザー",
+    b2bSales: "B2B営業",
+
+    // Features
+    featuresTitle: "顧客関係強化のためのスマートソリューション",
+    featuresSubtitle: "AIが業界ニュースを画像で作成し、Telegramで顧客に自動配信して関係を強化します。",
+
+    feature1Title: "AIニュース自動生成",
+    feature1Desc: "業界トレンドと顧客に有益な情報をAIが自動分析し、ニュースコンテンツを生成します。",
+
+    feature2Title: "プロフェッショナルな画像制作",
+    feature2Desc: "生成されたニュースを視覚的に魅力的な画像に自動変換し、顧客の関心を引きます。",
+
+    feature3Title: "Telegram自動配信",
+    feature3Desc: "作成されたニュース画像をTelegramチャネルを通じて顧客に自動配信します。",
+
+    feature4Title: "顧客グループ管理",
+    feature4Desc: "既存顧客と潜在顧客をグループ別に管理し、カスタマイズしたコンテンツを配信できます。",
+
+    // Testimonials
+    testimonialsTitle: "営業プロフェッショナルの生の声",
+    testimonialsSubtitle: "多くの営業職プロフェッショナルがAI Daily Contentで顧客関係を強化しています。",
+
+    // Pricing
+    pricingTitle: "シンプルな単一料金プラン",
+    pricingSubtitle: "複雑なプラン選択なし - 一つの料金ですべての機能を利用可能",
+    planName: "プロプラン",
+    planDescription: "営業プロフェッショナルのための完璧なソリューション",
+    perMonth: "/月",
+    getStarted: "始める",
+
+    // Features list
+    unlimitedNews: "無制限ニュース生成",
+    aiImageCreation: "AI画像自動作成",
+    telegramIntegration: "Telegramチャネル連携",
+    customerGroupManagement: "顧客グループ管理",
+    scheduledSending: "予約配信機能",
+    advancedAnalytics: "詳細分析ダッシュボード",
+    prioritySupport: "優先サポート",
+    customTemplates: "カスタムテンプレート",
+
+    // CTA
+    ctaTitle: "今すぐ始めましょう",
+    ctaDescription: "7日間無料でお試しいただけます。クレジットカード不要です。",
+    bookConsultation: "相談予約",
+    sevenDayFreeTrial: "7日間無料トライアル",
+    noCreditCard: "クレジットカード不要",
+    cancelAnytime: "いつでもキャンセル可能",
+
+    // Footer
+    footerDescription: "営業職のためのAI画像ニュース作成・配信サービス",
+    allRightsReserved: "全著作権所有",
+
+    product: "製品",
+    company: "会社",
+    legal: "法的情報",
+    support: "サポート",
+
+    security: "セキュリティ",
+    roadmap: "ロードマップ",
+    about: "会社概要",
+    blog: "ブログ",
+    careers: "採用情報",
+    privacy: "プライバシーポリシー",
+    terms: "利用規約",
+    cookies: "クッキーポリシー",
+    compliance: "コンプライアンス",
+    docs: "ドキュメント",
+    api: "API",
+    guides: "ガイド",
+    customerSupport: "カスタマーサポート",
   },
 }
 

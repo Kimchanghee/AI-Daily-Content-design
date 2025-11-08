@@ -105,6 +105,56 @@ const testimonialsData = {
       rating: 5,
     },
   ],
+  ja: [
+    {
+      quote:
+        "毎日顧客に送る有益な情報を探すのに時間がかかっていましたが、今はAIが自動でニュースを作成し、テレグラムで自動配信してくれるので、顧客管理が非常に楽になりました。",
+      author: "金成浩",
+      role: "保険プランナー",
+      company: "経験15年",
+      rating: 5,
+    },
+    {
+      quote:
+        "不動産市場の動向を画像にして顧客に送ったところ、反応がとても良いです。おかげで相談依頼が30％増加しました。",
+      author: "朴智英",
+      role: "不動産仲介人",
+      company: "江南支店",
+      rating: 5,
+    },
+    {
+      quote:
+        "金融情報を簡単かつ迅速に伝えられるようになり、顧客満足度が大幅に向上しました。テレグラムでの自動配信により、業務効率も2倍以上に増加しました。",
+      author: "李俊赫",
+      role: "金融アドバイザー",
+      company: "プライベートバンキングチーム",
+      rating: 5,
+    },
+    {
+      quote:
+        "医療情報と健康のヒントを定期的に患者に伝えることで、信頼度が高まりました。予約キャンセル率が減少し、再訪問率が増加しました。",
+      author: "崔敏秀",
+      role: "歯科医院長",
+      company: "ソウル歯科医院",
+      rating: 5,
+    },
+    {
+      quote:
+        "税務スケジュールや節税のヒントを自動的に顧客に伝えることで、顧客管理が本当に便利になりました。紹介で新規顧客も大幅に増えました。",
+      author: "鄭秀妍",
+      role: "税理士",
+      company: "鄭秀妍税務会計事務所",
+      rating: 5,
+    },
+    {
+      quote:
+        "法律ニュースや判例を顧客に送ることで、専門性が認められるようになりました。相談申し込みが以前より40％以上増えました。",
+      author: "姜泰賢",
+      role: "弁護士",
+      company: "法務法人正道",
+      rating: 5,
+    },
+  ],
 }
 
 export default function Testimonials() {
@@ -115,10 +165,23 @@ export default function Testimonials() {
     if (savedLocale) {
       setLocale(savedLocale)
     }
+
+    const handleLocaleChange = () => {
+      const newLocale = localStorage.getItem("locale") as Locale
+      if (newLocale) {
+        setLocale(newLocale)
+      }
+    }
+
+    window.addEventListener("localeChange", handleLocaleChange)
+
+    return () => {
+      window.removeEventListener("localeChange", handleLocaleChange)
+    }
   }, [])
 
   const t = (key: keyof typeof import("@/lib/i18n").translations.ko) => getTranslation(locale, key)
-  const testimonials = testimonialsData[locale]
+  const testimonials = testimonialsData[locale] || testimonialsData.ko
 
   return (
     <section id="후기" className="px-4 py-20 md:py-32 bg-background">

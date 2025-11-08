@@ -11,6 +11,21 @@ export default function Footer() {
     if (savedLocale) {
       setLocale(savedLocale)
     }
+
+    const handleLocaleChange = () => {
+      const newLocale = localStorage.getItem("locale") as Locale
+      if (newLocale) {
+        setLocale(newLocale)
+      }
+    }
+
+    window.addEventListener("storage", handleLocaleChange)
+    window.addEventListener("localeChange", handleLocaleChange)
+
+    return () => {
+      window.removeEventListener("storage", handleLocaleChange)
+      window.removeEventListener("localeChange", handleLocaleChange)
+    }
   }, [])
 
   const t = (key: keyof typeof import("@/lib/i18n").translations.ko) => getTranslation(locale, key)
@@ -23,61 +38,64 @@ export default function Footer() {
   }
 
   return (
-    <footer className="border-t border-border bg-background px-4 py-12 md:py-16">
+    <footer className="border-t border-border bg-background px-4 py-8 md:py-10">
       <div className="mx-auto max-w-6xl">
-        <div className="grid gap-8 md:grid-cols-5">
+        <div className="grid gap-6 md:gap-8 grid-cols-1">
           {/* Brand */}
-          <div className="md:col-span-1">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-r from-primary to-accent rounded-xl flex items-center justify-center">
-                <span className="text-white text-lg font-bold">AI</span>
+          <div className="mb-2">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-9 h-9 bg-gradient-to-r from-primary to-accent rounded-xl flex items-center justify-center">
+                <span className="text-white text-base font-bold">AI</span>
               </div>
-              <span className="text-lg font-bold text-foreground">AI Daily Content</span>
+              <span className="text-base font-bold text-foreground">AI Daily Content</span>
             </div>
-            <p className="text-xs text-muted-foreground">{t("footerDescription")}</p>
+            <p className="text-xs text-muted-foreground max-w-md">{t("footerDescription")}</p>
           </div>
 
-          {/* Link Groups */}
-          {Object.entries(footerLinks).map(([category, links]) => (
-            <div key={category}>
-              <h4 className="mb-4 text-sm font-semibold text-foreground">{category}</h4>
-              <ul className="space-y-2">
-                {links.map((link) => (
-                  <li key={link}>
-                    <a href="#" className="text-sm text-muted-foreground hover:text-accent transition-colors">
-                      {link}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+            {Object.entries(footerLinks).map(([category, links]) => (
+              <div key={category}>
+                <h4 className="mb-2 text-xs font-semibold text-foreground">{category}</h4>
+                <ul className="space-y-1.5">
+                  {links.map((link) => (
+                    <li key={link}>
+                      <a href="#" className="text-xs text-muted-foreground hover:text-accent transition-colors block">
+                        {link}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Bottom Footer */}
-        <div className="mt-12 border-t border-border pt-8">
-          <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-            <p className="text-xs text-muted-foreground">© 2025 AI Daily Content. {t("allRightsReserved")}.</p>
+        <div className="mt-8 border-t border-border pt-6">
+          <div className="flex flex-col items-center justify-between gap-3 md:flex-row">
+            <p className="text-xs text-muted-foreground text-center md:text-left">
+              © 2025 AI Daily Content. {t("allRightsReserved")}.
+            </p>
 
             {/* Social Icons */}
-            <div className="flex gap-4">
+            <div className="flex gap-3">
               <a
                 href="#"
-                className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border hover:bg-muted transition-colors text-lg"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border hover:bg-muted transition-colors text-base"
                 aria-label="Instagram"
               >
                 📷
               </a>
               <a
                 href="#"
-                className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border hover:bg-muted transition-colors text-lg"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border hover:bg-muted transition-colors text-base"
                 aria-label="Telegram"
               >
                 💬
               </a>
               <a
                 href="#"
-                className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border hover:bg-muted transition-colors text-lg"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border hover:bg-muted transition-colors text-base"
                 aria-label="Email"
               >
                 ✉️

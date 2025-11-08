@@ -9,20 +9,34 @@ interface LanguageSwitcherProps {
 }
 
 export default function LanguageSwitcher({ currentLocale, onLocaleChange }: LanguageSwitcherProps) {
+  const languageNames: Record<Locale, string> = {
+    ko: "한국어",
+    en: "English",
+    ja: "日本語",
+  }
+
+  const handleLocaleChange = (locale: Locale) => {
+    onLocaleChange(locale)
+    window.dispatchEvent(new CustomEvent("localeChange"))
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="sm" className="gap-2">
           <span>🌐</span>
-          <span className="text-sm">{currentLocale === "ko" ? "한국어" : "English"}</span>
+          <span className="text-sm">{languageNames[currentLocale]}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => onLocaleChange("ko")} className="cursor-pointer">
+        <DropdownMenuItem onClick={() => handleLocaleChange("ko")} className="cursor-pointer">
           한국어
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => onLocaleChange("en")} className="cursor-pointer">
+        <DropdownMenuItem onClick={() => handleLocaleChange("en")} className="cursor-pointer">
           English
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => handleLocaleChange("ja")} className="cursor-pointer">
+          日本語
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
