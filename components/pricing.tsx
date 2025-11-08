@@ -5,73 +5,34 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { getTranslation, type Locale } from "@/lib/i18n"
 
-const plans = [
-  {
-    name: "베이직",
-    price: "₩29,000",
-    period: "/월",
-    description: "개인 사업자와 소규모 셀러에게 적합",
-    features: ["월 30개 콘텐츠 생성", "기본 템플릿 제공", "텔레그램 연동", "이메일 지원", "7일 무료 체험"],
-    highlighted: false,
-  },
-  {
-    name: "프로",
-    price: "₩79,000",
-    period: "/월",
-    description: "성장하는 비즈니스를 위한 최적의 선택",
-    features: [
-      "월 100개 콘텐츠 생성",
-      "프리미엄 템플릿 무제한",
-      "다중 채널 연동",
-      "우선 지원",
-      "브랜드 맞춤 AI 학습",
-      "고급 스케줄링",
-      "분석 대시보드",
-    ],
-    highlighted: true,
-  },
-  {
-    name: "엔터프라이즈",
-    price: "문의",
-    period: "필요",
-    description: "대규모 비즈니스를 위한 맞춤형 솔루션",
-    features: [
-      "무제한 콘텐츠 생성",
-      "커스텀 템플릿 제작",
-      "전담 계정 매니저",
-      "24/7 전화 지원",
-      "API 연동",
-      "온프레미스 옵션",
-      "맞춤형 AI 모델",
-    ],
-    highlighted: false,
-  },
-]
-
 export default function Pricing() {
   const [locale, setLocale] = useState<Locale>("ko")
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    const savedLocale = localStorage.getItem("locale") as Locale
+    setMounted(true)
+    const savedLocale = (typeof window !== "undefined" && localStorage.getItem("locale")) as Locale
     if (savedLocale) {
       setLocale(savedLocale)
     }
 
     const handleLocaleChange = () => {
-      const newLocale = localStorage.getItem("locale") as Locale
+      const newLocale = (typeof window !== "undefined" && localStorage.getItem("locale")) as Locale
       if (newLocale) {
         setLocale(newLocale)
       }
     }
 
-    window.addEventListener("storage", handleLocaleChange)
     window.addEventListener("localeChange", handleLocaleChange)
 
     return () => {
-      window.removeEventListener("storage", handleLocaleChange)
       window.removeEventListener("localeChange", handleLocaleChange)
     }
   }, [])
+
+  if (!mounted) {
+    return null
+  }
 
   const t = (key: keyof typeof import("@/lib/i18n").translations.ko) => getTranslation(locale, key)
 

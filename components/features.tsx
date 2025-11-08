@@ -6,28 +6,32 @@ import { getTranslation, type Locale } from "@/lib/i18n"
 
 export default function Features() {
   const [locale, setLocale] = useState<Locale>("ko")
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    const savedLocale = localStorage.getItem("locale") as Locale
+    setMounted(true)
+    const savedLocale = (typeof window !== "undefined" && localStorage.getItem("locale")) as Locale
     if (savedLocale) {
       setLocale(savedLocale)
     }
 
     const handleLocaleChange = () => {
-      const newLocale = localStorage.getItem("locale") as Locale
+      const newLocale = (typeof window !== "undefined" && localStorage.getItem("locale")) as Locale
       if (newLocale) {
         setLocale(newLocale)
       }
     }
 
-    window.addEventListener("storage", handleLocaleChange)
     window.addEventListener("localeChange", handleLocaleChange)
 
     return () => {
-      window.removeEventListener("storage", handleLocaleChange)
       window.removeEventListener("localeChange", handleLocaleChange)
     }
   }, [])
+
+  if (!mounted) {
+    return null
+  }
 
   const t = (key: keyof typeof import("@/lib/i18n").translations.ko) => getTranslation(locale, key)
 

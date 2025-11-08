@@ -159,15 +159,17 @@ const testimonialsData = {
 
 export default function Testimonials() {
   const [locale, setLocale] = useState<Locale>("ko")
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    const savedLocale = localStorage.getItem("locale") as Locale
+    setMounted(true)
+    const savedLocale = (typeof window !== "undefined" && localStorage.getItem("locale")) as Locale
     if (savedLocale) {
       setLocale(savedLocale)
     }
 
     const handleLocaleChange = () => {
-      const newLocale = localStorage.getItem("locale") as Locale
+      const newLocale = (typeof window !== "undefined" && localStorage.getItem("locale")) as Locale
       if (newLocale) {
         setLocale(newLocale)
       }
@@ -179,6 +181,10 @@ export default function Testimonials() {
       window.removeEventListener("localeChange", handleLocaleChange)
     }
   }, [])
+
+  if (!mounted) {
+    return null
+  }
 
   const t = (key: keyof typeof import("@/lib/i18n").translations.ko) => getTranslation(locale, key)
   const testimonials = testimonialsData[locale] || testimonialsData.ko
