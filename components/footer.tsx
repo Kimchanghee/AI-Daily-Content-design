@@ -1,15 +1,27 @@
 "use client"
 
-import { Mail, MessageCircle, Instagram } from "lucide-react"
-
-const footerLinks = {
-  제품: ["기능", "요금제", "보안", "로드맵"],
-  회사: ["소개", "블로그", "채용", "문의"],
-  법률: ["개인정보처리방침", "이용약관", "쿠키 정책", "컴플라이언스"],
-  지원: ["문서", "API", "가이드", "고객지원"],
-}
+import { useState, useEffect } from "react"
+import { getTranslation, type Locale } from "@/lib/i18n"
 
 export default function Footer() {
+  const [locale, setLocale] = useState<Locale>("ko")
+
+  useEffect(() => {
+    const savedLocale = localStorage.getItem("locale") as Locale
+    if (savedLocale) {
+      setLocale(savedLocale)
+    }
+  }, [])
+
+  const t = (key: keyof typeof import("@/lib/i18n").translations.ko) => getTranslation(locale, key)
+
+  const footerLinks = {
+    [t("product")]: [t("features"), t("pricing"), t("security"), t("roadmap")],
+    [t("company")]: [t("about"), t("blog"), t("careers"), t("contact")],
+    [t("legal")]: [t("privacy"), t("terms"), t("cookies"), t("compliance")],
+    [t("support")]: [t("docs"), "API", t("guides"), t("customerSupport")],
+  }
+
   return (
     <footer className="border-t border-border bg-background px-4 py-12 md:py-16">
       <div className="mx-auto max-w-6xl">
@@ -22,9 +34,7 @@ export default function Footer() {
               </div>
               <span className="text-lg font-bold text-foreground">AI Daily Content</span>
             </div>
-            <p className="text-xs text-muted-foreground">
-              매일 꾸준한 SNS 콘텐츠를 AI가 자동으로 생성하는 구독형 서비스
-            </p>
+            <p className="text-xs text-muted-foreground">{t("footerDescription")}</p>
           </div>
 
           {/* Link Groups */}
@@ -47,30 +57,30 @@ export default function Footer() {
         {/* Bottom Footer */}
         <div className="mt-12 border-t border-border pt-8">
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-            <p className="text-xs text-muted-foreground">© 2025 AI Daily Content. All rights reserved.</p>
+            <p className="text-xs text-muted-foreground">© 2025 AI Daily Content. {t("allRightsReserved")}.</p>
 
             {/* Social Icons */}
             <div className="flex gap-4">
               <a
                 href="#"
-                className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border hover:bg-muted transition-colors"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border hover:bg-muted transition-colors text-lg"
                 aria-label="Instagram"
               >
-                <Instagram size={16} />
+                📷
               </a>
               <a
                 href="#"
-                className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border hover:bg-muted transition-colors"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border hover:bg-muted transition-colors text-lg"
                 aria-label="Telegram"
               >
-                <MessageCircle size={16} />
+                💬
               </a>
               <a
                 href="#"
-                className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border hover:bg-muted transition-colors"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border hover:bg-muted transition-colors text-lg"
                 aria-label="Email"
               >
-                <Mail size={16} />
+                ✉️
               </a>
             </div>
           </div>

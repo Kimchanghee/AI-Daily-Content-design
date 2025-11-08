@@ -1,8 +1,9 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Check } from "lucide-react"
+import { getTranslation, type Locale } from "@/lib/i18n"
 
 const plans = [
   {
@@ -48,67 +49,70 @@ const plans = [
 ]
 
 export default function Pricing() {
+  const [locale, setLocale] = useState<Locale>("ko")
+
+  useEffect(() => {
+    const savedLocale = localStorage.getItem("locale") as Locale
+    if (savedLocale) {
+      setLocale(savedLocale)
+    }
+  }, [])
+
+  const t = (key: keyof typeof import("@/lib/i18n").translations.ko) => getTranslation(locale, key)
+
+  const features = [
+    t("unlimitedNews"),
+    t("aiImageCreation"),
+    t("telegramIntegration"),
+    t("customerGroupManagement"),
+    t("scheduledSending"),
+    t("advancedAnalytics"),
+    t("prioritySupport"),
+    t("customTemplates"),
+  ]
+
   return (
-    <section id="요금제" className="bg-card/30 px-4 py-20 md:py-32">
-      <div className="mx-auto max-w-6xl">
+    <section id="요금제" className="bg-card/30 px-4 sm:px-6 lg:px-8 py-16 sm:py-20 md:py-24 lg:py-32">
+      <div className="mx-auto max-w-7xl">
         {/* Section Header */}
-        <div className="mx-auto mb-16 max-w-2xl text-center">
-          <h2 className="section-title mb-4">합리적인 구독 요금제</h2>
-          <div className="w-20 h-1 bg-gradient-to-r from-primary to-accent mx-auto rounded-full mb-4"></div>
-          <p className="section-subtitle">
-            비즈니스 규모에 맞는 요금제를 선택하세요. 모든 플랜은 7일 무료 체험이 가능합니다.
-          </p>
+        <div className="mx-auto mb-12 sm:mb-16 max-w-2xl text-center">
+          <h2 className="section-title mb-3 sm:mb-4 text-2xl sm:text-3xl md:text-4xl lg:text-5xl">
+            {t("pricingTitle")}
+          </h2>
+          <div className="w-16 sm:w-20 h-1 bg-gradient-to-r from-primary to-accent mx-auto rounded-full mb-3 sm:mb-4"></div>
+          <p className="section-subtitle text-base sm:text-lg px-4">{t("pricingSubtitle")}</p>
         </div>
 
-        {/* Pricing Cards */}
-        <div className="grid gap-8 lg:grid-cols-3 max-w-5xl mx-auto">
-          {plans.map((plan) => (
-            <Card
-              key={plan.name}
-              className={`border-2 transition-all ${
-                plan.highlighted
-                  ? "border-accent bg-background/80 shadow-2xl ring-1 ring-accent/30 transform scale-105"
-                  : "border-border bg-background/50 hover:shadow-lg"
-              }`}
-            >
-              {plan.highlighted && (
-                <div className="bg-gradient-to-r from-primary to-accent text-accent-foreground px-4 py-3 text-center font-semibold">
-                  ⭐ 가장 인기있는 플랜
-                </div>
-              )}
+        <div className="max-w-lg mx-auto px-2 sm:px-4">
+          <Card className="border-2 border-accent bg-background/80 shadow-2xl ring-1 ring-accent/30 overflow-hidden">
+            <div className="bg-gradient-to-r from-primary to-accent text-accent-foreground px-4 py-2.5 sm:py-3 text-center font-semibold text-sm sm:text-base">
+              ⭐ {t("planName")}
+            </div>
 
-              <CardHeader>
-                <h3 className="mb-2 text-2xl font-bold text-foreground">{plan.name}</h3>
-                <p className="mb-4 text-sm text-muted-foreground">{plan.description}</p>
-                <div className="flex items-baseline gap-1 mb-2">
-                  <span className="text-5xl md:text-6xl font-bold text-foreground">{plan.price}</span>
-                  <span className="text-sm text-muted-foreground">{plan.period}</span>
-                </div>
-              </CardHeader>
+            <CardHeader className="px-4 sm:px-6 pt-6 sm:pt-8">
+              <h3 className="mb-2 text-xl sm:text-2xl font-bold text-foreground">{t("planName")}</h3>
+              <p className="mb-4 text-sm text-muted-foreground leading-relaxed">{t("planDescription")}</p>
+              <div className="flex items-baseline gap-1 mb-2">
+                <span className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground">₩19,800</span>
+                <span className="text-sm text-muted-foreground">{t("perMonth")}</span>
+              </div>
+            </CardHeader>
 
-              <CardContent className="space-y-6">
-                <Button
-                  className={`w-full font-semibold ${
-                    plan.highlighted
-                      ? "bg-gradient-to-r from-primary to-accent text-accent-foreground hover:opacity-90 transform hover:scale-105 transition-all"
-                      : "border-border hover:bg-muted/50"
-                  }`}
-                  variant={plan.highlighted ? "default" : "outline"}
-                >
-                  시작하기 →
-                </Button>
+            <CardContent className="space-y-6 px-4 sm:px-6 pb-6 sm:pb-8">
+              <Button className="w-full font-semibold text-base bg-gradient-to-r from-primary to-accent text-accent-foreground hover:opacity-90 transform hover:scale-105 transition-all min-h-[48px]">
+                {t("getStarted")} →
+              </Button>
 
-                <div className="space-y-3">
-                  {plan.features.map((feature) => (
-                    <div key={feature} className="flex items-start gap-3">
-                      <Check className="h-5 w-5 flex-shrink-0 text-accent" />
-                      <span className="text-sm text-foreground">{feature}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+              <div className="space-y-3">
+                {features.map((feature) => (
+                  <div key={feature} className="flex items-start gap-3">
+                    <span className="text-accent text-lg sm:text-xl flex-shrink-0 mt-0.5">✓</span>
+                    <span className="text-sm sm:text-base text-foreground leading-relaxed">{feature}</span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </section>

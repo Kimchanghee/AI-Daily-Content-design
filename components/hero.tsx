@@ -1,50 +1,76 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { ArrowRight } from "lucide-react"
+import { getTranslation, type Locale } from "@/lib/i18n"
 
 export default function Hero() {
+  const [locale, setLocale] = useState<Locale>("ko")
+
+  useEffect(() => {
+    const savedLocale = localStorage.getItem("locale") as Locale
+    if (savedLocale) {
+      setLocale(savedLocale)
+    }
+  }, [])
+
+  const t = (key: keyof typeof import("@/lib/i18n").translations.ko) => getTranslation(locale, key)
+
+  const userTypes = [t("insurance"), t("realEstate"), t("finance"), t("b2bSales")]
+
   return (
-    <section className="relative overflow-hidden bg-background px-4 py-20 md:py-32 pt-32">
+    <section className="relative overflow-hidden bg-background px-4 sm:px-6 lg:px-8 py-16 sm:py-24 md:py-32 lg:py-40 xl:py-48 pt-24 sm:pt-32">
       <div className="absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute -top-1/2 -right-1/4 w-96 h-96 bg-primary/20 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
-        <div className="absolute -bottom-1/2 -left-1/4 w-96 h-96 bg-accent/20 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
+        <div className="absolute -top-1/2 -right-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-primary/20 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
+        <div className="absolute -bottom-1/2 -left-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-accent/20 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
       </div>
 
-      <div className="mx-auto max-w-6xl">
-        <div className="mx-auto max-w-3xl text-center">
+      <div className="mx-auto max-w-7xl">
+        <div className="mx-auto max-w-4xl text-center">
           {/* Badge */}
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card/50 px-4 py-1.5 backdrop-blur-sm">
-            <span className="h-2 w-2 rounded-full bg-accent" />
-            <span className="text-xs font-semibold uppercase tracking-wide text-accent">AI 콘텐츠 자동화 플랫폼</span>
+          <div className="mb-4 sm:mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card/50 px-3 sm:px-4 py-1.5 backdrop-blur-sm">
+            <span className="h-2 w-2 rounded-full bg-accent animate-pulse" />
+            <span className="text-xs font-semibold uppercase tracking-wide text-accent">{t("badge")}</span>
           </div>
 
+          {/* Title */}
+          <h1 className="mb-4 sm:mb-6 text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-balance leading-tight">
+            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              {t("heroTitle1")}
+            </span>
+            <br />
+            <span className="text-foreground">{t("heroTitle2")}</span>
+          </h1>
+
           {/* Description */}
-          <p className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-3xl mx-auto text-balance">
-            소상공인과 셀러를 위한 생성형 AI 기반 일일 콘텐츠 자동 제작 서비스. 브랜드 정보만 입력하면 매일 SNS용
-            콘텐츠가 자동으로 생성되고 예약 발송됩니다.
+          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground mb-8 sm:mb-10 max-w-3xl mx-auto text-balance leading-relaxed px-2">
+            {t("heroDescription")}
           </p>
 
           {/* CTAs */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 mb-10 sm:mb-12 px-4 sm:px-0">
             <Button
               size="lg"
-              className="px-8 bg-gradient-to-r from-primary to-accent text-accent-foreground hover:opacity-90 transform hover:scale-105 transition-all shadow-lg"
+              className="px-8 py-4 sm:py-3 text-base sm:text-lg bg-gradient-to-r from-primary to-accent text-accent-foreground hover:opacity-90 transform hover:scale-105 transition-all shadow-lg min-h-[48px]"
             >
-              7일 무료 체험 시작
-              <ArrowRight className="ml-2 h-4 w-4" />
+              {t("start7DayTrial")}
+              <span className="ml-2">→</span>
             </Button>
-            <Button size="lg" variant="outline" className="px-8 border-border hover:bg-muted/50 bg-transparent">
-              데모 영상 보기
+            <Button
+              size="lg"
+              variant="outline"
+              className="px-8 py-4 sm:py-3 text-base sm:text-lg border-border hover:bg-muted/50 bg-transparent min-h-[48px]"
+            >
+              {t("viewIntro")}
             </Button>
           </div>
 
           {/* Social proof */}
-          <div className="flex flex-col items-center gap-4">
-            <p className="text-sm text-muted-foreground">이미 많은 소상공인이 사용 중입니다</p>
-            <div className="flex flex-wrap items-center justify-center gap-8">
-              {["카페 사장님", "쇼핑몰 운영자", "마케팅 담당자", "1인 셀러"].map((user) => (
-                <div key={user} className="text-sm font-semibold text-muted-foreground opacity-60">
+          <div className="flex flex-col items-center gap-3 sm:gap-4">
+            <p className="text-xs sm:text-sm text-muted-foreground">{t("alreadyUsedBy")}</p>
+            <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 lg:gap-8">
+              {userTypes.map((user) => (
+                <div key={user} className="text-xs sm:text-sm font-semibold text-muted-foreground opacity-60 px-2">
                   {user}
                 </div>
               ))}
