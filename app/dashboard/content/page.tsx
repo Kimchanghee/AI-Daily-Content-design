@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { getCurrentUser, type User } from "@/lib/auth"
 import { getContents, type Content, deleteContent } from "@/lib/content"
-import { Plus, Search, Calendar, FileText, Trash2, Edit, Eye } from "lucide-react"
 import Link from "next/link"
 import {
   AlertDialog,
@@ -92,9 +91,7 @@ export default function ContentPage() {
             <p className="text-muted-foreground mt-2">AI로 생성한 콘텐츠를 관리하고 예약 발송하세요</p>
           </div>
           <Link href="/dashboard/content/create">
-            <Button className="gap-2">
-              <Plus className="w-4 h-4" />새 콘텐츠 생성
-            </Button>
+            <Button className="gap-2">{/* <Plus className="w-4 h-4" /> */}새 콘텐츠 생성</Button>
           </Link>
         </div>
 
@@ -103,7 +100,7 @@ export default function ContentPage() {
           <CardContent className="pt-6">
             <div className="flex gap-4">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                {/* <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" /> */}
                 <Input
                   placeholder="콘텐츠 검색..."
                   value={searchQuery}
@@ -174,7 +171,7 @@ export default function ContentPage() {
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between text-sm">
                   <div className="flex items-center gap-2 text-muted-foreground">
-                    <Calendar className="w-4 h-4" />
+                    {/* <Calendar className="w-4 h-4" /> */}
                     <span>
                       {content.scheduledDate
                         ? new Date(content.scheduledDate).toLocaleDateString("ko-KR")
@@ -186,13 +183,13 @@ export default function ContentPage() {
                 <div className="flex gap-2">
                   <Link href={`/dashboard/content/${content.id}`} className="flex-1">
                     <Button variant="outline" size="sm" className="w-full gap-2 bg-transparent">
-                      <Eye className="w-4 h-4" />
+                      {/* <Eye className="w-4 h-4" /> */}
                       보기
                     </Button>
                   </Link>
                   <Link href={`/dashboard/content/${content.id}/edit`} className="flex-1">
                     <Button variant="outline" size="sm" className="w-full gap-2 bg-transparent">
-                      <Edit className="w-4 h-4" />
+                      {/* <Edit className="w-4 h-4" /> */}
                       수정
                     </Button>
                   </Link>
@@ -202,7 +199,7 @@ export default function ContentPage() {
                     className="gap-2 text-red-600 hover:text-red-700 bg-transparent"
                     onClick={() => setDeleteId(content.id)}
                   >
-                    <Trash2 className="w-4 h-4" />
+                    {/* <Trash2 className="w-4 h-4" /> */}
                   </Button>
                 </div>
               </CardContent>
@@ -213,12 +210,12 @@ export default function ContentPage() {
         {filteredContents.length === 0 && (
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
-              <FileText className="w-12 h-12 text-muted-foreground mb-4" />
+              {/* <FileText className="w-12 h-12 text-muted-foreground mb-4" /> */}
               <h3 className="text-lg font-semibold mb-2">콘텐츠가 없습니다</h3>
               <p className="text-muted-foreground mb-4">첫 번째 콘텐츠를 생성해보세요</p>
               <Link href="/dashboard/content/create">
                 <Button>
-                  <Plus className="w-4 h-4 mr-2" />
+                  {/* <Plus className="w-4 h-4 mr-2" /> */}
                   콘텐츠 생성하기
                 </Button>
               </Link>

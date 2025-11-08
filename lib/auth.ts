@@ -1,5 +1,4 @@
 import { createClient } from "@/lib/supabase/client"
-import { createClient as createServerClient } from "@/lib/supabase/server"
 
 export interface User {
   id: string
@@ -92,28 +91,4 @@ export async function getCurrentUser(): Promise<User | null> {
 export async function signOut() {
   const supabase = createClient()
   await supabase.auth.signOut()
-}
-
-// Server-side 함수들
-export async function getServerUser(): Promise<User | null> {
-  const supabase = await createServerClient()
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) return null
-
-  // 프로필 정보 가져오기
-  const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single()
-
-  const role = user.email === "admin@aidaily.com" ? "admin" : "user"
-
-  return {
-    id: user.id,
-    email: user.email!,
-    name: profile?.name || user.email!.split("@")[0],
-    role,
-    createdAt: new Date(user.created_at),
-  }
 }

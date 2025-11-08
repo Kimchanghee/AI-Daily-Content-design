@@ -39,4 +39,6 @@ function Button({ className = "", variant = "default", size = "default", ...prop
   return <button className={classes} {...props} />
 }
 
+export const buttonVariants = getButtonClasses
+
 export { Button }
