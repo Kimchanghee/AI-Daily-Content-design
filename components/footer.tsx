@@ -5,25 +5,30 @@ import { getTranslation, type Locale } from "@/lib/i18n"
 
 export default function Footer() {
   const [locale, setLocale] = useState<Locale>("ko")
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    const savedLocale = localStorage.getItem("locale") as Locale
-    if (savedLocale) {
-      setLocale(savedLocale)
-    }
+    setMounted(true)
 
-    const handleLocaleChange = () => {
-      const newLocale = localStorage.getItem("locale") as Locale
-      if (newLocale) {
-        setLocale(newLocale)
+    if (typeof window !== "undefined") {
+      const savedLocale = localStorage.getItem("locale") as Locale
+      if (savedLocale) {
+        setLocale(savedLocale)
       }
     }
 
-    window.addEventListener("storage", handleLocaleChange)
+    const handleLocaleChange = () => {
+      if (typeof window !== "undefined") {
+        const newLocale = localStorage.getItem("locale") as Locale
+        if (newLocale) {
+          setLocale(newLocale)
+        }
+      }
+    }
+
     window.addEventListener("localeChange", handleLocaleChange)
 
     return () => {
-      window.removeEventListener("storage", handleLocaleChange)
       window.removeEventListener("localeChange", handleLocaleChange)
     }
   }, [])
@@ -35,6 +40,10 @@ export default function Footer() {
     [t("company")]: [t("about"), t("blog"), t("careers"), t("contact")],
     [t("legal")]: [t("privacy"), t("terms"), t("cookies"), t("compliance")],
     [t("support")]: [t("docs"), "API", t("guides"), t("customerSupport")],
+  }
+
+  if (!mounted) {
+    return null
   }
 
   return (

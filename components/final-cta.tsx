@@ -6,30 +6,39 @@ import { getTranslation, type Locale } from "@/lib/i18n"
 
 export default function FinalCTA() {
   const [locale, setLocale] = useState<Locale>("ko")
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    const savedLocale = localStorage.getItem("locale") as Locale
-    if (savedLocale) {
-      setLocale(savedLocale)
-    }
+    setMounted(true)
 
-    const handleLocaleChange = () => {
-      const newLocale = localStorage.getItem("locale") as Locale
-      if (newLocale) {
-        setLocale(newLocale)
+    if (typeof window !== "undefined") {
+      const savedLocale = localStorage.getItem("locale") as Locale
+      if (savedLocale) {
+        setLocale(savedLocale)
       }
     }
 
-    window.addEventListener("storage", handleLocaleChange)
+    const handleLocaleChange = () => {
+      if (typeof window !== "undefined") {
+        const newLocale = localStorage.getItem("locale") as Locale
+        if (newLocale) {
+          setLocale(newLocale)
+        }
+      }
+    }
+
     window.addEventListener("localeChange", handleLocaleChange)
 
     return () => {
-      window.removeEventListener("storage", handleLocaleChange)
       window.removeEventListener("localeChange", handleLocaleChange)
     }
   }, [])
 
   const t = (key: keyof typeof import("@/lib/i18n").translations.ko) => getTranslation(locale, key)
+
+  if (!mounted) {
+    return null
+  }
 
   return (
     <section className="relative overflow-hidden px-4 py-8 md:py-12">

@@ -11,37 +11,45 @@ export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
   const [user, setUser] = useState<User | null>(null)
   const [locale, setLocale] = useState<Locale>("ko")
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
+
     const loadUser = async () => {
       const currentUser = await getCurrentUser()
       setUser(currentUser)
     }
     loadUser()
 
-    // Load saved locale from localStorage
-    const savedLocale = localStorage.getItem("locale") as Locale
-    if (savedLocale) {
-      setLocale(savedLocale)
-    }
-
-    const handleLocaleChange = () => {
-      const newLocale = localStorage.getItem("locale") as Locale
-      if (newLocale) {
-        setLocale(newLocale)
+    if (typeof window !== "undefined") {
+      const savedLocale = localStorage.getItem("locale") as Locale
+      if (savedLocale) {
+        setLocale(savedLocale)
       }
     }
 
-    window.addEventListener("localeChange", handleLocaleChange)
+    const handleLocaleChangeEvent = () => {
+      if (typeof window !== "undefined") {
+        const newLocale = localStorage.getItem("locale") as Locale
+        if (newLocale) {
+          setLocale(newLocale)
+        }
+      }
+    }
+
+    window.addEventListener("localeChange", handleLocaleChangeEvent)
 
     return () => {
-      window.removeEventListener("localeChange", handleLocaleChange)
+      window.removeEventListener("localeChange", handleLocaleChangeEvent)
     }
   }, [])
 
-  const handleLocaleChange = (newLocale: Locale) => {
+  const handleLocaleChangeFromSwitcher = (newLocale: Locale) => {
     setLocale(newLocale)
-    localStorage.setItem("locale", newLocale)
+    if (typeof window !== "undefined") {
+      localStorage.setItem("locale", newLocale)
+    }
   }
 
   const t = (key: keyof typeof import("@/lib/i18n").translations.ko) => getTranslation(locale, key)
@@ -52,6 +60,10 @@ export default function Header() {
     { label: t("pricing"), id: "요금제" },
     { label: t("contact"), id: "문의" },
   ]
+
+  if (!mounted) {
+    return null
+  }
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border shadow-sm">
@@ -82,7 +94,7 @@ export default function Header() {
 
           {/* Right Side */}
           <div className="flex items-center gap-2 sm:gap-4">
-            <LanguageSwitcher currentLocale={locale} onLocaleChange={handleLocaleChange} />
+            <LanguageSwitcher currentLocale={locale} onLocaleChange={handleLocaleChangeFromSwitcher} />
 
             {user ? (
               <Link href={user.role === "admin" ? "/admin/dashboard" : "/dashboard"}>
