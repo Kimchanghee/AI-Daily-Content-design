@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { getTranslation, type Locale } from "@/lib/i18n"
@@ -9,6 +9,14 @@ export default function Pricing() {
   const [locale, setLocale] = useState<Locale>("ko")
   const [mounted, setMounted] = useState(false)
 
+  const handleLocaleChange = useCallback(() => {
+    if (typeof window === "undefined") return
+    const newLocale = localStorage.getItem("locale")
+    if (newLocale && (newLocale === "ko" || newLocale === "en" || newLocale === "ja")) {
+      setLocale(newLocale as Locale)
+    }
+  }, [])
+
   useEffect(() => {
     setMounted(true)
     const savedLocale = typeof window !== "undefined" ? localStorage.getItem("locale") : null
@@ -16,19 +24,12 @@ export default function Pricing() {
       setLocale(savedLocale as Locale)
     }
 
-    const handleLocaleChange = () => {
-      const newLocale = typeof window !== "undefined" ? localStorage.getItem("locale") : null
-      if (newLocale && (newLocale === "ko" || newLocale === "en" || newLocale === "ja")) {
-        setLocale(newLocale as Locale)
-      }
-    }
-
     window.addEventListener("localeChange", handleLocaleChange)
 
     return () => {
       window.removeEventListener("localeChange", handleLocaleChange)
     }
-  }, [])
+  }, [handleLocaleChange])
 
   if (!mounted) {
     return null
