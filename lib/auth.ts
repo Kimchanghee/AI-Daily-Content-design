@@ -25,13 +25,16 @@ export async function authenticate(email: string, password: string): Promise<Use
     document.cookie = `session=${JSON.stringify(data.user)}; path=/; max-age=604800`
   }
 
-  const role = data.user.email === "admin@aidaily.com" ? "admin" : "user"
+  // 프로필에서 role 가져오기
+  const { data: profile } = await supabase.from("profiles").select("role, name").eq("id", data.user.id).single()
+
+  const role = profile?.role || "user"
 
   return {
     id: data.user.id,
     email: data.user.email!,
-    name: data.user.email!.split("@")[0],
-    role,
+    name: profile?.name || data.user.email!.split("@")[0],
+    role: role as "user" | "admin",
     createdAt: new Date(data.user.created_at),
   }
 }
@@ -74,16 +77,16 @@ export async function getCurrentUser(): Promise<User | null> {
 
   if (!user) return null
 
-  // 프로필 정보 가져오기
+  // 프로필 정보 가져오기 (role 포함)
   const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single()
 
-  const role = user.email === "admin@aidaily.com" ? "admin" : "user"
+  const role = profile?.role || "user"
 
   return {
     id: user.id,
     email: user.email!,
     name: profile?.name || user.email!.split("@")[0],
-    role,
+    role: role as "user" | "admin",
     createdAt: new Date(user.created_at),
   }
 }

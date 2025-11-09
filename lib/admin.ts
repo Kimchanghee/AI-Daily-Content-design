@@ -1,5 +1,6 @@
 // 관리자 기능 유틸리티
 
+import { createClient } from "@/lib/supabase/client"
 import type { User } from "./auth"
 import type { Content } from "./content"
 import type { MessagingChannel } from "./messaging"
@@ -111,8 +112,38 @@ export async function getAdminStats(): Promise<AdminStats> {
 }
 
 export async function getAllUsers(): Promise<Array<User & { lastLogin?: Date; subscription?: string }>> {
-  // 실제로는 데이터베이스에서 조회
-  return allUsers
+  const supabase = createClient()
+
+  // profiles와 subscriptions 조인하여 사용자 정보 가져오기
+  const { data: profiles, error } = await supabase
+    .from("profiles")
+    .select(`
+      id,
+      email,
+      name,
+      role,
+      created_at,
+      subscriptions (
+        plan_name
+      )
+    `)
+    .order("created_at", { ascending: false })
+
+  if (error) {
+    console.error("Error fetching users:", error)
+    return []
+  }
+
+  return (
+    profiles?.map((profile: any) => ({
+      id: profile.id,
+      email: profile.email,
+      name: profile.name || profile.email.split("@")[0],
+      role: profile.role as "user" | "admin",
+      createdAt: new Date(profile.created_at),
+      subscription: profile.subscriptions?.[0]?.plan_name,
+    })) || []
+  )
 }
 
 export async function getUserById(id: string): Promise<(User & { lastLogin?: Date; subscription?: string }) | null> {
@@ -121,18 +152,27 @@ export async function getUserById(id: string): Promise<(User & { lastLogin?: Dat
 }
 
 export async function updateUserRole(userId: string, role: "user" | "admin"): Promise<void> {
-  // 실제로는 데이터베이스 업데이트
-  const user = allUsers.find((u) => u.id === userId)
-  if (user) {
-    user.role = role
+  const supabase = createClient()
+
+  const { error } = await supabase.from("profiles").update({ role }).eq("id", userId)
+
+  if (error) {
+    console.error("Error updating user role:", error)
+    throw new Error("역할 업데이트에 실패했습니다.")
   }
 }
 
 export async function deleteUser(userId: string): Promise<void> {
-  // 실제로는 데이터베이스에서 삭제
-  const index = allUsers.findIndex((u) => u.id === userId)
-  if (index !== -1) {
-    allUsers.splice(index, 1)
+  const supabase = createClient()
+
+  // auth.users 테이블에서 삭제하면 CASCADE로 profiles도 자동 삭제됨
+  // 하지만 auth.users는 직접 삭제할 수 없으므로 관리자 API 사용 필요
+  // 현재는 profiles만 삭제 (실제 운영환경에서는 Supabase Admin API 사용)
+  const { error } = await supabase.from("profiles").delete().eq("id", userId)
+
+  if (error) {
+    console.error("Error deleting user:", error)
+    throw new Error("사용자 삭제에 실패했습니다.")
   }
 }
 

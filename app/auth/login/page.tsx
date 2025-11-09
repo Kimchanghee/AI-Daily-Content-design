@@ -46,8 +46,11 @@ export default function LoginPage() {
         localStorage.setItem("session", JSON.stringify(data.session))
       }
 
+      // DB에서 role 확인
+      const { data: profile } = await supabase.from("profiles").select("role").eq("id", data.user!.id).single()
+
       // 관리자 계정인지 확인
-      if (data.user?.email === "admin@aidaily.com") {
+      if (profile?.role === "admin") {
         router.push("/admin/dashboard")
       } else {
         router.push("/dashboard")
