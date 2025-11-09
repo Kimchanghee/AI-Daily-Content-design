@@ -22,6 +22,8 @@ export default function LoginPage() {
     setError("")
     setLoading(true)
 
+    console.log("[v0] Login attempt for:", email)
+
     try {
       const supabase = createClient()
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
@@ -29,10 +31,19 @@ export default function LoginPage() {
         password,
       })
 
+      console.log("[v0] Login response:", { data, error: signInError })
+
       if (signInError) {
+        console.error("[v0] Login error:", signInError)
         setError("이메일 또는 비밀번호가 올바르지 않습니다.")
         setLoading(false)
         return
+      }
+
+      console.log("[v0] Login successful, redirecting...")
+
+      if (typeof window !== "undefined" && data.session) {
+        localStorage.setItem("session", JSON.stringify(data.session))
       }
 
       // 관리자 계정인지 확인
@@ -43,6 +54,7 @@ export default function LoginPage() {
       }
       router.refresh()
     } catch (err) {
+      console.error("[v0] Login exception:", err)
       setError("로그인 중 오류가 발생했습니다.")
       setLoading(false)
     }

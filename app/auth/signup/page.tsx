@@ -35,28 +35,56 @@ export default function SignupPage() {
 
     setLoading(true)
 
+    console.log("[v0] Signup attempt for:", email)
+
     try {
       const supabase = createClient()
+
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || `${window.location.origin}/dashboard`,
+          emailRedirectTo: typeof window !== "undefined" ? `${window.location.origin}/dashboard` : undefined,
           data: {
             name: name,
           },
         },
       })
 
+      console.log("[v0] Signup response:", { data, error: signUpError })
+
       if (signUpError) {
+        console.error("[v0] Signup error:", signUpError)
         setError(signUpError.message)
         setLoading(false)
         return
       }
 
-      // 이메일 확인 필요 안내
-      router.push("/auth/verify-email")
+      console.log("[v0] Signup successful")
+
+      if (data.user) {
+        const { error: profileError } = await supabase.from("profiles").insert({
+          id: data.user.id,
+          name: name,
+          email: email,
+        })
+
+        if (profileError) {
+          console.error("[v0] Profile creation error:", profileError)
+        }
+      }
+
+      if (data.session) {
+        if (typeof window !== "undefined") {
+          localStorage.setItem("session", JSON.stringify(data.session))
+        }
+        router.push("/dashboard")
+      } else {
+        // 이메일 확인이 필요한 경우
+        router.push("/auth/verify-email")
+      }
     } catch (err: any) {
+      console.error("[v0] Signup exception:", err)
       setError(err.message || "회원가입 중 오류가 발생했습니다.")
       setLoading(false)
     }
