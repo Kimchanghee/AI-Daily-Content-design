@@ -20,17 +20,16 @@ export async function authenticate(email: string, password: string): Promise<Use
     return null
   }
 
-  if (typeof window !== "undefined") {
-    localStorage.setItem("session", JSON.stringify(data.user))
-    document.cookie = `session=${JSON.stringify(data.user)}; path=/; max-age=604800`
-  }
+  // Supabase가 자동으로 세션 쿠키를 관리하므로 수동 설정 불필요
 
-  const role = data.user.email === "admin@aidaily.com" ? "admin" : "user"
+  // 프로필에서 role 가져오기 (없으면 이메일로 판단)
+  const { data: profile } = await supabase.from("profiles").select("*").eq("id", data.user.id).single()
+  const role = profile?.role || (data.user.email === "admin@aidaily.com" ? "admin" : "user")
 
   return {
     id: data.user.id,
     email: data.user.email!,
-    name: data.user.email!.split("@")[0],
+    name: profile?.name || data.user.email!.split("@")[0],
     role,
     createdAt: new Date(data.user.created_at),
   }
@@ -51,10 +50,7 @@ export async function register(email: string, password: string, name: string): P
     throw new Error(error?.message || "회원가입에 실패했습니다.")
   }
 
-  if (typeof window !== "undefined") {
-    localStorage.setItem("session", JSON.stringify(data.user))
-    document.cookie = `session=${JSON.stringify(data.user)}; path=/; max-age=604800`
-  }
+  // Supabase가 자동으로 세션 쿠키를 관리하므로 수동 설정 불필요
 
   return {
     id: data.user.id,
@@ -77,7 +73,8 @@ export async function getCurrentUser(): Promise<User | null> {
   // 프로필 정보 가져오기
   const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single()
 
-  const role = user.email === "admin@aidaily.com" ? "admin" : "user"
+  // 프로필에서 role 가져오기 (없으면 이메일로 판단)
+  const role = profile?.role || (user.email === "admin@aidaily.com" ? "admin" : "user")
 
   return {
     id: user.id,

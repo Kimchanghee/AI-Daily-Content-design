@@ -42,12 +42,14 @@ export default function LoginPage() {
 
       console.log("[v0] Login successful, redirecting...")
 
-      if (typeof window !== "undefined" && data.session) {
-        localStorage.setItem("session", JSON.stringify(data.session))
-      }
+      // Supabase가 자동으로 세션을 관리하므로 수동 저장 불필요
+
+      // 프로필에서 role 가져오기
+      const { data: profile } = await supabase.from("profiles").select("role").eq("id", data.user.id).single()
+      const role = profile?.role || (data.user?.email === "admin@aidaily.com" ? "admin" : "user")
 
       // 관리자 계정인지 확인
-      if (data.user?.email === "admin@aidaily.com") {
+      if (role === "admin") {
         router.push("/admin/dashboard")
       } else {
         router.push("/dashboard")
