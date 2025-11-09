@@ -1,7 +1,6 @@
 import Link from "next/link"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Sparkles, Mail } from "lucide-react"
 
 export default function VerifyEmailPage() {
   return (
@@ -9,7 +8,7 @@ export default function VerifyEmailPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2 text-2xl font-bold">
-            <Sparkles className="w-8 h-8 text-blue-600" />
+            <span className="text-4xl">✨</span>
             <span className="bg-gradient-to-r from-blue-600 to-sky-600 bg-clip-text text-transparent">
               AI Daily Content
             </span>
@@ -19,7 +18,7 @@ export default function VerifyEmailPage() {
         <Card>
           <CardHeader className="text-center">
             <div className="mx-auto w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-              <Mail className="w-6 h-6 text-blue-600" />
+              <span className="text-2xl">📧</span>
             </div>
             <CardTitle>이메일을 확인해주세요</CardTitle>
             <CardDescription>회원가입이 거의 완료되었습니다!</CardDescription>

@@ -44,9 +44,13 @@ export default function SignupPage() {
         email,
         password,
         options: {
-          emailRedirectTo: typeof window !== "undefined" ? `${window.location.origin}/dashboard` : undefined,
+          emailRedirectTo:
+            typeof window !== "undefined" ? `${window.location.origin}/auth/callback?next=/dashboard` : undefined,
           data: {
             name: name,
+            full_name: name,
+            display_name: name,
+            service_name: "AI Daily Content",
           },
         },
       })
@@ -62,25 +66,14 @@ export default function SignupPage() {
 
       console.log("[v0] Signup successful")
 
-      if (data.user) {
-        const { error: profileError } = await supabase.from("profiles").insert({
-          id: data.user.id,
-          name: name,
-          email: email,
-        })
+      // No need to manually insert - the trigger handles it when auth.users row is created
 
-        if (profileError) {
-          console.error("[v0] Profile creation error:", profileError)
-        }
-      }
-
+      // Redirect based on whether session exists (email confirmation required or not)
       if (data.session) {
-        if (typeof window !== "undefined") {
-          localStorage.setItem("session", JSON.stringify(data.session))
-        }
+        // Email confirmation disabled - direct login
         router.push("/dashboard")
       } else {
-        // 이메일 확인이 필요한 경우
+        // Email confirmation required - show verification page
         router.push("/auth/verify-email")
       }
     } catch (err: any) {
