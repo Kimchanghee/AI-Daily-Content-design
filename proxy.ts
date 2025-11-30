@@ -1,10 +1,1 @@
-import type { NextRequest } from "next/server"
-import { updateSession } from "@/lib/supabase/middleware"
-
-export async function proxy(request: NextRequest) {
-  return await updateSession(request)
-}
-
-export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
-}
+// No proxy needed for 보험사 DM 서비스

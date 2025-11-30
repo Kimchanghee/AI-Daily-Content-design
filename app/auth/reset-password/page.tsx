@@ -10,6 +10,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Sparkles, ArrowLeft } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 
+const supabase = createClient()
+
 export default function ResetPasswordPage() {
   const [email, setEmail] = useState("")
   const [submitted, setSubmitted] = useState(false)
@@ -22,7 +24,6 @@ export default function ResetPasswordPage() {
     setError("")
 
     try {
-      const supabase = createClient()
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/auth/update-password`,
       })

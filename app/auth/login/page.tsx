@@ -10,6 +10,8 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { createClient } from "@/lib/supabase/client"
 
+const supabase = createClient()
+
 export default function LoginPage() {
   const router = useRouter()
   const [email, setEmail] = useState("")
@@ -25,7 +27,6 @@ export default function LoginPage() {
     console.log("[v0] Login attempt for:", email)
 
     try {
-      const supabase = createClient()
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -61,26 +62,23 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-sky-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2 text-2xl font-bold">
-            {/* replaced Sparkles icon with emoji */}
             <span className="text-4xl">✨</span>
-            <span className="bg-gradient-to-r from-blue-600 to-sky-600 bg-clip-text text-transparent">
-              AI Daily Content
-            </span>
+            <span className="text-foreground font-bold tracking-tight">보험사 데일리 메시지</span>
           </Link>
         </div>
 
         <Card>
           <CardHeader>
             <CardTitle>로그인</CardTitle>
-            <CardDescription>계정에 로그인하여 AI 뉴스 생성을 시작하세요</CardDescription>
+            <CardDescription>계정에 로그인하여 뉴스 생성을 시작하세요</CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
-              {error && <div className="p-3 text-sm text-red-600 bg-red-50 rounded-lg">{error}</div>}
+              {error && <div className="p-3 text-sm text-foreground bg-muted rounded-lg border">{error}</div>}
 
               <div className="space-y-2">
                 <Label htmlFor="email">이메일</Label>
@@ -107,20 +105,20 @@ export default function LoginPage() {
               </div>
 
               <div className="text-sm text-right">
-                <Link href="/auth/reset-password" className="text-blue-600 hover:underline">
+                <Link href="/auth/reset-password" className="text-foreground hover:underline font-medium">
                   비밀번호를 잊으셨나요?
                 </Link>
               </div>
             </CardContent>
 
             <CardFooter className="flex flex-col gap-4">
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button type="submit" className="w-full bg-black hover:bg-gray-800 text-white" disabled={loading}>
                 {loading ? "로그인 중..." : "로그인"}
               </Button>
 
               <div className="text-sm text-center text-muted-foreground">
                 계정이 없으신가요?{" "}
-                <Link href="/auth/signup" className="text-blue-600 hover:underline font-medium">
+                <Link href="/auth/signup" className="text-foreground hover:underline font-medium">
                   회원가입
                 </Link>
               </div>

@@ -7,9 +7,9 @@ const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "AI Daily Content - 영업직군을 위한 AI 이미지 뉴스 제작 서비스",
+  title: "보험사 데일리 메시지 - 최신 뉴스를 고객에게 전달",
   description:
-    "영업 전문가를 위한 AI 기반 이미지형 뉴스 자동 제작 및 텔레그램 발송 서비스. 매일 고객에게 가치있는 콘텐츠를 전달하세요.",
+    "보험 영업 전문가를 위한 데일리 메시지 서비스. 최신 뉴스를 선택한 템플릿으로 고객에게 자동 발송하세요. 3일 무료 체험.",
   generator: "v0.app",
 }
 
