@@ -140,17 +140,14 @@ export default function NewsTemplateSelector() {
   }, [newsData, userName, userPhone, profileImageLoaded])
 
   const handleDownload = () => {
-    if (!isLoggedIn) {
-      alert("로그인 후 3일 무료 체험을 시작하세요!\n\n지금 가입하시면 모든 템플릿을 무료로 이용하실 수 있습니다.")
-      router.push("/auth/login")
-      return
-    }
-
     if (!canvasRef.current) return
+
     const link = document.createElement("a")
     link.download = `daily-news-${new Date().toISOString().split("T")[0]}.png`
     link.href = canvasRef.current.toDataURL("image/png", 1.0)
+    document.body.appendChild(link)
     link.click()
+    document.body.removeChild(link)
   }
 
   const setMiniCanvasRef = (id: string) => (el: HTMLCanvasElement | null) => {
