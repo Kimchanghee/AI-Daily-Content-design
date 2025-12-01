@@ -50,17 +50,16 @@ const drawFullNewsItem = (
   const meta = `${news.source} | ${news.reporter} | ${news.publishedAt}`
   ctx.fillText(meta, x + 12, y + 18)
 
-  // 내용 요약 - 5배 확장 (최대 3줄)
+  // 내용 요약 (최대 2줄로 축소하여 겹침 방지)
   if (news.summary) {
     ctx.fillStyle = "#4a5568"
     ctx.font = "12px sans-serif"
 
-    // 요약 내용을 여러 줄로 나눠서 표시
     const words = news.summary.split(" ")
     let line = ""
     let lineY = y + 35
     let lineCount = 0
-    const maxLines = 3
+    const maxLines = 2
     const lineHeight = 16
 
     for (let i = 0; i < words.length && lineCount < maxLines; i++) {
@@ -82,10 +81,10 @@ const drawFullNewsItem = (
       lineCount++
     }
 
-    return 35 + lineCount * lineHeight + 15 // 간격 5배 확대
+    return 35 + lineCount * lineHeight + 10
   }
 
-  return 45 // 기본 간격도 확대
+  return 40
 }
 
 // 템플릿 1: 시티 나이트
@@ -134,8 +133,8 @@ export const renderCityNight = (
 
   // 프로필 영역
   const pX = 70,
-    pY = 65,
-    pR = 48
+    pY = 55,
+    pR = 40
   ctx.beginPath()
   ctx.arc(pX, pY, pR + 3, 0, Math.PI * 2)
   ctx.strokeStyle = "rgba(255,255,255,0.4)"
@@ -144,64 +143,52 @@ export const renderCityNight = (
   drawProfile(ctx, pX, pY, pR, user.profileImage, "#4a5568")
 
   ctx.fillStyle = "#ffffff"
-  ctx.font = "bold 22px 'Noto Sans KR', sans-serif"
-  ctx.fillText(user.name, 135, 48)
+  ctx.font = "bold 20px 'Noto Sans KR', sans-serif"
+  ctx.fillText(user.name, 125, 45)
   ctx.font = "14px sans-serif"
   ctx.fillStyle = "#a0aec0"
-  ctx.fillText("사업단장", 135 + ctx.measureText(user.name).width + 10, 48)
+  ctx.fillText("사업단장", 125 + ctx.measureText(user.name).width + 10, 45)
 
   ctx.fillStyle = "#48bb78"
-  ctx.font = "15px sans-serif"
-  ctx.fillText("📞 " + user.phone, 135, 75)
-  ctx.fillStyle = "#a0aec0"
-  ctx.fillText("📷 @instagram", 135, 97)
-
-  // 날씨
-  ctx.textAlign = "center"
-  ctx.font = "28px sans-serif"
-  ctx.fillText("☀️", width - 100, 45)
-  ctx.fillText("🌤️", width - 45, 45)
-  ctx.font = "12px sans-serif"
-  ctx.fillStyle = "#ffffff"
-  ctx.fillText("서울 8°", width - 100, 70)
-  ctx.fillText("부산 16°", width - 45, 70)
-  ctx.textAlign = "left"
+  ctx.font = "14px sans-serif"
+  ctx.fillText("📞 " + user.phone, 125, 70)
 
   // 뉴스 카드
   const cardX = 20,
-    cardY = 125,
+    cardY = 105,
     cardW = width - 40,
-    cardH = height - 290
+    cardH = height - 240
   ctx.fillStyle = "rgba(255,255,255,0.98)"
   ctx.beginPath()
   ctx.roundRect(cardX, cardY, cardW, cardH, 20)
   ctx.fill()
 
   ctx.fillStyle = "#1a202c"
-  ctx.font = "bold 24px 'Georgia', serif"
-  ctx.fillText("Today's News", cardX + 25, cardY + 42)
+  ctx.font = "bold 22px 'Georgia', serif"
+  ctx.fillText("Today's News", cardX + 25, cardY + 38)
   ctx.textAlign = "right"
-  ctx.font = "13px sans-serif"
+  ctx.font = "12px sans-serif"
   ctx.fillStyle = "#718096"
-  ctx.fillText(getDateString(), cardX + cardW - 25, cardY + 42)
+  ctx.fillText(getDateString(), cardX + cardW - 25, cardY + 38)
   ctx.textAlign = "left"
 
   ctx.strokeStyle = "#e2e8f0"
   ctx.lineWidth = 1
   ctx.beginPath()
-  ctx.moveTo(cardX + 25, cardY + 58)
-  ctx.lineTo(cardX + cardW - 25, cardY + 58)
+  ctx.moveTo(cardX + 25, cardY + 52)
+  ctx.lineTo(cardX + cardW - 25, cardY + 52)
   ctx.stroke()
 
-  let y = cardY + 85
+  let y = cardY + 75
+  const maxNewsY = cardY + cardH - 30
   news.slice(0, 8).forEach((item, i) => {
-    if (y > cardY + cardH - 80) return
+    if (y > maxNewsY) return
     const lineH = drawFullNewsItem(ctx, item, cardX + 25, y, cardW - 50, i < 3)
     y += lineH
   })
 
   // 주식 정보
-  const stockY = height - 135
+  const stockY = height - 115
   const stockW = (width - 60) / 3
   const stocks = [
     { label: "KOSPI", value: "3,926.59", change: "60.32", up: false },
@@ -213,18 +200,18 @@ export const renderCityNight = (
     const bx = 20 + i * (stockW + 10)
     ctx.fillStyle = "rgba(255,255,255,0.95)"
     ctx.beginPath()
-    ctx.roundRect(bx, stockY, stockW, 90, 12)
+    ctx.roundRect(bx, stockY, stockW, 80, 12)
     ctx.fill()
 
     ctx.textAlign = "center"
     ctx.fillStyle = "#1a202c"
-    ctx.font = "bold 14px sans-serif"
-    ctx.fillText(s.label, bx + stockW / 2, stockY + 28)
-    ctx.font = "bold 22px sans-serif"
-    ctx.fillText(s.value, bx + stockW / 2, stockY + 58)
+    ctx.font = "bold 13px sans-serif"
+    ctx.fillText(s.label, bx + stockW / 2, stockY + 24)
+    ctx.font = "bold 20px sans-serif"
+    ctx.fillText(s.value, bx + stockW / 2, stockY + 50)
     ctx.fillStyle = s.up ? "#e53e3e" : "#3182ce"
-    ctx.font = "13px sans-serif"
-    ctx.fillText((s.up ? "▲ " : "▼ ") + s.change, bx + stockW / 2, stockY + 78)
+    ctx.font = "12px sans-serif"
+    ctx.fillText((s.up ? "▲ " : "▼ ") + s.change, bx + stockW / 2, stockY + 68)
   })
   ctx.textAlign = "left"
 }
@@ -265,8 +252,8 @@ export const renderLuxuryGold = (
 
   // 중앙 프로필
   const pX = width / 2,
-    pY = 100,
-    pR = 45
+    pY = 85,
+    pR = 40
   ctx.beginPath()
   ctx.arc(pX, pY, pR + 5, 0, Math.PI * 2)
   ctx.strokeStyle = "#d4af37"
@@ -276,26 +263,18 @@ export const renderLuxuryGold = (
 
   ctx.textAlign = "center"
   ctx.fillStyle = "#d4af37"
-  ctx.font = "bold 24px 'Georgia', serif"
-  ctx.fillText(user.name, width / 2, pY + 70)
+  ctx.font = "bold 22px 'Georgia', serif"
+  ctx.fillText(user.name, width / 2, pY + 60)
   ctx.fillStyle = "#888"
-  ctx.font = "14px sans-serif"
-  ctx.fillText(user.phone, width / 2, pY + 92)
-
-  // 날씨
   ctx.font = "13px sans-serif"
-  ctx.fillStyle = "#d4af37"
-  ctx.textAlign = "left"
-  ctx.fillText("☀️ 서울 8°", 50, 50)
-  ctx.textAlign = "right"
-  ctx.fillText("🌙 부산 16°", width - 50, 50)
+  ctx.fillText(user.phone, width / 2, pY + 80)
   ctx.textAlign = "left"
 
   // 뉴스 카드
   const cardX = 40,
-    cardY = 220,
+    cardY = 190,
     cardW = width - 80,
-    cardH = height - 330
+    cardH = height - 280
   ctx.fillStyle = "rgba(255,255,255,0.97)"
   ctx.beginPath()
   ctx.roundRect(cardX, cardY, cardW, cardH, 15)
@@ -306,25 +285,26 @@ export const renderLuxuryGold = (
 
   ctx.textAlign = "center"
   ctx.fillStyle = "#1a1a2e"
-  ctx.font = "bold 20px 'Georgia', serif"
-  ctx.fillText("✦ Today's News ✦", width / 2, cardY + 38)
+  ctx.font = "bold 18px 'Georgia', serif"
+  ctx.fillText("✦ Today's News ✦", width / 2, cardY + 32)
   ctx.font = "11px sans-serif"
   ctx.fillStyle = "#888"
-  ctx.fillText(getDateString(), width / 2, cardY + 58)
+  ctx.fillText(getDateString(), width / 2, cardY + 50)
   ctx.textAlign = "left"
 
-  let y = cardY + 85
+  let y = cardY + 75
+  const maxNewsY = cardY + cardH - 30
   news.slice(0, 6).forEach((item, i) => {
-    if (y > cardY + cardH - 80) return
+    if (y > maxNewsY) return
     const lineH = drawFullNewsItem(ctx, item, cardX + 20, y, cardW - 40, i < 2)
     y += lineH
   })
 
   // 하단 주식
-  const stockY = height - 90
+  const stockY = height - 75
   ctx.fillStyle = "rgba(255,255,255,0.95)"
   ctx.beginPath()
-  ctx.roundRect(40, stockY - 15, width - 80, 55, 12)
+  ctx.roundRect(40, stockY - 10, width - 80, 45, 12)
   ctx.fill()
   ctx.textAlign = "center"
   ctx.fillStyle = "#1a1a2e"
@@ -365,43 +345,39 @@ export const renderOceanBlue = (
   // 상단 프로필 카드
   ctx.fillStyle = "rgba(255,255,255,0.97)"
   ctx.beginPath()
-  ctx.roundRect(15, 15, width - 30, 95, 18)
+  ctx.roundRect(15, 15, width - 30, 80, 18)
   ctx.fill()
 
-  drawProfile(ctx, 65, 62, 35, user.profileImage, "#4a90a4")
+  drawProfile(ctx, 55, 55, 30, user.profileImage, "#4a90a4")
 
   ctx.fillStyle = "#0a3d62"
-  ctx.font = "bold 20px sans-serif"
-  ctx.fillText(user.name, 115, 52)
-  ctx.font = "13px sans-serif"
-  ctx.fillStyle = "#1e6091"
-  ctx.fillText(user.phone, 115, 75)
-
-  // 날씨
-  ctx.textAlign = "right"
+  ctx.font = "bold 18px sans-serif"
+  ctx.fillText(user.name, 100, 48)
   ctx.font = "12px sans-serif"
+  ctx.fillStyle = "#1e6091"
+  ctx.fillText(user.phone, 100, 68)
+
+  // 날짜
+  ctx.textAlign = "right"
+  ctx.font = "11px sans-serif"
   ctx.fillStyle = "#0a3d62"
-  ctx.fillText("☀️ 서울 8° | ⛅ 부산 16°", width - 28, 60)
+  ctx.fillText(getDateString(), width - 28, 55)
   ctx.textAlign = "left"
 
   // 뉴스 카드
   ctx.fillStyle = "rgba(255,255,255,0.97)"
   ctx.beginPath()
-  ctx.roundRect(15, 125, width - 30, height - 210, 18)
+  ctx.roundRect(15, 110, width - 30, height - 185, 18)
   ctx.fill()
 
   ctx.fillStyle = "#0a3d62"
   ctx.font = "bold 18px sans-serif"
-  ctx.fillText("📰 Today's News", 35, 160)
-  ctx.textAlign = "right"
-  ctx.font = "11px sans-serif"
-  ctx.fillStyle = "#666"
-  ctx.fillText(getDateString(), width - 35, 160)
-  ctx.textAlign = "left"
+  ctx.fillText("📰 Today's News", 35, 145)
 
-  let y = 190
+  let y = 175
+  const maxNewsY = height - 100
   news.slice(0, 7).forEach((item, i) => {
-    if (y > height - 240) return
+    if (y > maxNewsY) return
     const lineH = drawFullNewsItem(ctx, item, 35, y, width - 70, i < 3)
     y += lineH
   })
@@ -409,13 +385,13 @@ export const renderOceanBlue = (
   // 주식
   ctx.fillStyle = "rgba(255,255,255,0.97)"
   ctx.beginPath()
-  ctx.roundRect(15, height - 70, width - 30, 55, 16)
+  ctx.roundRect(15, height - 60, width - 30, 45, 16)
   ctx.fill()
 
   ctx.textAlign = "center"
   ctx.fillStyle = "#0a3d62"
   ctx.font = "bold 12px sans-serif"
-  ctx.fillText("KOSPI 3,926 ▼60  |  KOSDAQ 912 ▲32  |  환율 1,470 ▲7", width / 2, height - 38)
+  ctx.fillText("KOSPI 3,926 ▼60  |  KOSDAQ 912 ▲32  |  환율 1,470 ▲7", width / 2, height - 32)
   ctx.textAlign = "left"
 }
 
@@ -452,40 +428,41 @@ export const renderForestGreen = (
 
   // 상단 바
   ctx.fillStyle = "rgba(255,255,255,0.97)"
-  ctx.fillRect(0, 0, width, 80)
+  ctx.fillRect(0, 0, width, 75)
 
-  drawProfile(ctx, 48, 40, 30, user.profileImage, "#56ab91")
+  drawProfile(ctx, 45, 38, 28, user.profileImage, "#56ab91")
 
   ctx.fillStyle = "#1b4332"
-  ctx.font = "bold 18px sans-serif"
-  ctx.fillText(user.name, 90, 35)
+  ctx.font = "bold 17px sans-serif"
+  ctx.fillText(user.name, 85, 32)
   ctx.font = "12px sans-serif"
   ctx.fillStyle = "#56ab91"
-  ctx.fillText(user.phone, 90, 55)
+  ctx.fillText(user.phone, 85, 52)
 
   ctx.textAlign = "right"
-  ctx.font = "12px sans-serif"
+  ctx.font = "11px sans-serif"
   ctx.fillStyle = "#1b4332"
-  ctx.fillText("🌿 " + getDateString(), width - 18, 45)
+  ctx.fillText("🌿 " + getDateString(), width - 18, 42)
   ctx.textAlign = "left"
 
   // 메인 뉴스 카드
   ctx.fillStyle = "rgba(255,255,255,0.95)"
   ctx.beginPath()
-  ctx.roundRect(18, 95, width - 36, height - 170, 20)
+  ctx.roundRect(18, 90, width - 36, height - 160, 20)
   ctx.fill()
 
   // 세로 장식
   ctx.fillStyle = "#56ab91"
-  ctx.fillRect(40, 118, 4, height - 220)
+  ctx.fillRect(40, 110, 4, height - 200)
 
   ctx.fillStyle = "#1b4332"
-  ctx.font = "bold 20px sans-serif"
-  ctx.fillText("Today's News", 58, 145)
+  ctx.font = "bold 18px sans-serif"
+  ctx.fillText("Today's News", 58, 135)
 
-  let y = 175
+  let y = 165
+  const maxNewsY = height - 95
   news.slice(0, 7).forEach((item, i) => {
-    if (y > height - 200) return
+    if (y > maxNewsY) return
     const lineH = drawFullNewsItem(ctx, item, 58, y, width - 100, i < 3)
     y += lineH
   })
@@ -493,13 +470,13 @@ export const renderForestGreen = (
   // 하단 주식
   ctx.fillStyle = "rgba(255,255,255,0.95)"
   ctx.beginPath()
-  ctx.roundRect(18, height - 60, width - 36, 45, 14)
+  ctx.roundRect(18, height - 55, width - 36, 40, 14)
   ctx.fill()
 
   ctx.textAlign = "center"
   ctx.fillStyle = "#1b4332"
-  ctx.font = "12px sans-serif"
-  ctx.fillText("KOSPI 3,926 ▼60  |  KOSDAQ 912 ▲32  |  환율 1,470 ▲7", width / 2, height - 32)
+  ctx.font = "11px sans-serif"
+  ctx.fillText("KOSPI 3,926 ▼60  |  KOSDAQ 912 ▲32  |  환율 1,470 ▲7", width / 2, height - 30)
   ctx.textAlign = "left"
 }
 
@@ -519,63 +496,58 @@ export const renderSunsetWarm = (
   ctx.fillStyle = bgGrad
   ctx.fillRect(0, 0, width, height)
 
-  // 태양 장식
+  // 태양 장식 (우측 상단, 프로필 카드와 겹치지 않게)
   ctx.beginPath()
-  ctx.arc(width - 60, 90, 60, 0, Math.PI * 2)
+  ctx.arc(width - 40, 50, 40, 0, Math.PI * 2)
   ctx.fillStyle = "rgba(255,255,200,0.3)"
   ctx.fill()
   ctx.beginPath()
-  ctx.arc(width - 60, 90, 40, 0, Math.PI * 2)
+  ctx.arc(width - 40, 50, 25, 0, Math.PI * 2)
   ctx.fillStyle = "rgba(255,255,220,0.45)"
   ctx.fill()
 
   // 프로필 카드
   ctx.fillStyle = "rgba(255,255,255,0.97)"
   ctx.beginPath()
-  ctx.roundRect(15, 15, width - 30, 90, 18)
+  ctx.roundRect(15, 15, width - 100, 75, 18)
   ctx.fill()
 
-  drawProfile(ctx, 60, 60, 33, user.profileImage, "#ff8a65")
+  drawProfile(ctx, 55, 52, 28, user.profileImage, "#ff8a65")
 
   ctx.fillStyle = "#bf360c"
-  ctx.font = "bold 20px sans-serif"
-  ctx.fillText(user.name, 108, 50)
-  ctx.font = "13px sans-serif"
-  ctx.fillStyle = "#ff7043"
-  ctx.fillText(user.phone, 108, 73)
-
-  ctx.textAlign = "right"
-  ctx.fillStyle = "#bf360c"
+  ctx.font = "bold 18px sans-serif"
+  ctx.fillText(user.name, 95, 45)
   ctx.font = "12px sans-serif"
-  ctx.fillText("☀️ 서울 8° | 부산 16°", width - 28, 58)
-  ctx.textAlign = "left"
+  ctx.fillStyle = "#ff7043"
+  ctx.fillText(user.phone, 95, 65)
 
   // 뉴스 카드
   ctx.fillStyle = "rgba(255,255,255,0.97)"
   ctx.beginPath()
-  ctx.roundRect(15, 120, width - 30, height - 195, 20)
+  ctx.roundRect(15, 105, width - 30, height - 175, 20)
   ctx.fill()
 
   ctx.fillStyle = "#bf360c"
-  ctx.font = "bold 20px sans-serif"
-  ctx.fillText("🌅 Today's News", 38, 155)
+  ctx.font = "bold 18px sans-serif"
+  ctx.fillText("🌅 Today's News", 38, 138)
   ctx.textAlign = "right"
   ctx.font = "11px sans-serif"
   ctx.fillStyle = "#888"
-  ctx.fillText(getDateString(), width - 38, 155)
+  ctx.fillText(getDateString(), width - 38, 138)
   ctx.textAlign = "left"
 
   // 구분선
   ctx.strokeStyle = "#ffccbc"
   ctx.lineWidth = 1
   ctx.beginPath()
-  ctx.moveTo(38, 170)
-  ctx.lineTo(width - 38, 170)
+  ctx.moveTo(38, 152)
+  ctx.lineTo(width - 38, 152)
   ctx.stroke()
 
-  let y = 195
+  let y = 175
+  const maxNewsY = height - 95
   news.slice(0, 7).forEach((item, i) => {
-    if (y > height - 220) return
+    if (y > maxNewsY) return
     const lineH = drawFullNewsItem(ctx, item, 38, y, width - 76, i < 2)
     y += lineH
   })
@@ -583,13 +555,13 @@ export const renderSunsetWarm = (
   // 주식
   ctx.fillStyle = "rgba(255,255,255,0.97)"
   ctx.beginPath()
-  ctx.roundRect(15, height - 60, width - 30, 45, 14)
+  ctx.roundRect(15, height - 55, width - 30, 40, 14)
   ctx.fill()
 
   ctx.textAlign = "center"
   ctx.fillStyle = "#bf360c"
-  ctx.font = "bold 12px sans-serif"
-  ctx.fillText("KOSPI 3,926 ▼60  |  KOSDAQ 912 ▲32  |  환율 1,470 ▲7", width / 2, height - 32)
+  ctx.font = "bold 11px sans-serif"
+  ctx.fillText("KOSPI 3,926 ▼60  |  KOSDAQ 912 ▲32  |  환율 1,470 ▲7", width / 2, height - 30)
   ctx.textAlign = "left"
 }
 
@@ -607,54 +579,55 @@ export const renderMinimalMono = (
 
   // 상단 검정 바
   ctx.fillStyle = "#000000"
-  ctx.fillRect(0, 0, width, 105)
+  ctx.fillRect(0, 0, width, 90)
 
-  drawProfile(ctx, 55, 52, 38, user.profileImage, "#333")
+  drawProfile(ctx, 50, 45, 32, user.profileImage, "#333")
 
   ctx.fillStyle = "#ffffff"
-  ctx.font = "bold 22px sans-serif"
-  ctx.fillText(user.name, 108, 45)
-  ctx.font = "13px sans-serif"
+  ctx.font = "bold 20px sans-serif"
+  ctx.fillText(user.name, 95, 40)
+  ctx.font = "12px sans-serif"
   ctx.fillStyle = "#aaa"
-  ctx.fillText(user.phone, 108, 68)
+  ctx.fillText(user.phone, 95, 60)
 
   ctx.textAlign = "right"
   ctx.fillStyle = "#fff"
-  ctx.font = "12px sans-serif"
-  ctx.fillText(getDateString(), width - 22, 52)
+  ctx.font = "11px sans-serif"
+  ctx.fillText(getDateString(), width - 22, 50)
   ctx.textAlign = "left"
 
   // 뉴스 영역
   ctx.fillStyle = "#f8f8f8"
-  ctx.fillRect(0, 105, width, height - 175)
+  ctx.fillRect(0, 90, width, height - 150)
 
   ctx.fillStyle = "#000"
-  ctx.font = "bold 20px sans-serif"
-  ctx.fillText("TODAY'S NEWS", 28, 140)
+  ctx.font = "bold 18px sans-serif"
+  ctx.fillText("TODAY'S NEWS", 28, 125)
 
   // 구분선
   ctx.strokeStyle = "#000"
   ctx.lineWidth = 2
   ctx.beginPath()
-  ctx.moveTo(28, 152)
-  ctx.lineTo(180, 152)
+  ctx.moveTo(28, 135)
+  ctx.lineTo(170, 135)
   ctx.stroke()
 
-  let y = 180
+  let y = 160
+  const maxNewsY = height - 85
   news.slice(0, 7).forEach((item, i) => {
-    if (y > height - 195) return
+    if (y > maxNewsY) return
     const lineH = drawFullNewsItem(ctx, item, 28, y, width - 56, i < 3)
     y += lineH
   })
 
   // 하단 검정 바
   ctx.fillStyle = "#000000"
-  ctx.fillRect(0, height - 70, width, 70)
+  ctx.fillRect(0, height - 60, width, 60)
 
   ctx.textAlign = "center"
   ctx.fillStyle = "#fff"
-  ctx.font = "bold 12px sans-serif"
-  ctx.fillText("KOSPI 3,926 ▼60  |  KOSDAQ 912 ▲32  |  환율 1,470 ▲7", width / 2, height - 35)
+  ctx.font = "bold 11px sans-serif"
+  ctx.fillText("KOSPI 3,926 ▼60  |  KOSDAQ 912 ▲32  |  환율 1,470 ▲7", width / 2, height - 30)
   ctx.textAlign = "left"
 }
 

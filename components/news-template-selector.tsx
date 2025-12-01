@@ -291,15 +291,21 @@ export default function NewsTemplateSelector() {
                 <span className="w-1 h-5 bg-black rounded-full" />
                 미리보기
               </h3>
-              <div className="bg-gray-200 rounded-xl flex items-center justify-center flex-1" style={{ padding: "7%" }}>
+              <div
+                className="bg-gray-200 rounded-xl flex items-center justify-center"
+                style={{
+                  padding: isMobile ? "5%" : "3%",
+                  maxHeight: isMobile ? "none" : "580px",
+                }}
+              >
                 <canvas
                   ref={canvasRef}
                   className="rounded-lg shadow-2xl"
                   style={{
-                    maxHeight: "100%",
+                    maxHeight: isMobile ? "500px" : "540px",
                     maxWidth: "100%",
                     width: "auto",
-                    height: "100%",
+                    height: "auto",
                   }}
                 />
               </div>
