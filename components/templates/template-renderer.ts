@@ -223,29 +223,29 @@ export const renderLuxuryGold = (
     ctx.fillRect(c.x, c.y, 4, 20)
   })
 
-  // 중앙 프로필
+  // 중앙 프로필 - 크기 축소 및 간격 개선
   const pX = width / 2,
-    pY = 85,
-    pR = 40
+    pY = 70,
+    pR = 32
   ctx.beginPath()
-  ctx.arc(pX, pY, pR + 5, 0, Math.PI * 2)
+  ctx.arc(pX, pY, pR + 3, 0, Math.PI * 2)
   ctx.strokeStyle = "#d4af37"
-  ctx.lineWidth = 3
+  ctx.lineWidth = 2
   ctx.stroke()
   drawProfile(ctx, pX, pY, pR, user.profileImage, "#2d2d44")
 
   ctx.textAlign = "center"
   ctx.fillStyle = "#d4af37"
-  ctx.font = "bold 22px 'Georgia', serif"
-  ctx.fillText(user.name, width / 2, pY + 60)
+  ctx.font = "bold 18px 'Georgia', serif"
+  ctx.fillText(user.name, width / 2, pY + 55)
   ctx.fillStyle = "#888"
-  ctx.font = "13px sans-serif"
-  ctx.fillText(user.phone, width / 2, pY + 80)
+  ctx.font = "12px sans-serif"
+  ctx.fillText(user.phone, width / 2, pY + 72)
   ctx.textAlign = "left"
 
   // 뉴스 카드
   const cardX = 40,
-    cardY = 190,
+    cardY = 165,
     cardW = width - 80,
     cardH = height - 280
   ctx.fillStyle = "rgba(255,255,255,0.97)"
