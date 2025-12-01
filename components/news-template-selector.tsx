@@ -330,15 +330,19 @@ export default function NewsTemplateSelector() {
               </h3>
               {isMobile ? (
                 /* 모바일: 풀 너비 중앙 정렬 */
-                <div className="bg-gray-200 rounded-xl p-4 flex flex-col items-center">
-                  <canvas ref={canvasRef} className="rounded-lg shadow-2xl" />
-                  <Button
-                    onClick={handleDownload}
-                    className="mt-4 bg-black hover:bg-gray-800 text-white px-8 py-3 text-sm font-bold rounded-full shadow-lg"
-                  >
-                    이미지 다운로드 (PNG)
-                  </Button>
-                </div>
+                <>
+                  <div className="bg-gray-200 rounded-xl p-4 flex justify-center">
+                    <canvas ref={canvasRef} className="rounded-lg shadow-2xl" />
+                  </div>
+                  <div className="mt-4 flex justify-center">
+                    <Button
+                      onClick={handleDownload}
+                      className="bg-black hover:bg-gray-800 text-white px-8 py-3 text-sm font-bold rounded-full shadow-lg"
+                    >
+                      이미지 다운로드 (PNG)
+                    </Button>
+                  </div>
+                </>
               ) : (
                 /* PC: 미리보기 중심 레이아웃 */
                 <>
