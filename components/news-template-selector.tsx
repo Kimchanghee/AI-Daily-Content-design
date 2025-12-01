@@ -91,8 +91,19 @@ export default function NewsTemplateSelector() {
     const dpr = 2
     canvas.width = CANVAS_WIDTH * dpr
     canvas.height = CANVAS_HEIGHT * dpr
-    canvas.style.width = `100%`
-    canvas.style.height = `auto`
+
+    // PC와 모바일 각각 다른 크기 설정 (9:16 비율 유지)
+    if (isMobile) {
+      // 모바일: 가로 기준 최대 320px
+      const mobileWidth = Math.min(320, window.innerWidth - 40)
+      canvas.style.width = `${mobileWidth}px`
+      canvas.style.height = `${mobileWidth * (960 / 540)}px`
+    } else {
+      // PC: 고정 크기 300x533 (9:16 비율)
+      canvas.style.width = "300px"
+      canvas.style.height = "533px"
+    }
+
     ctx.scale(dpr, dpr)
 
     renderTemplate(selectedTemplate, ctx, CANVAS_WIDTH, CANVAS_HEIGHT, newsData, {
@@ -100,7 +111,7 @@ export default function NewsTemplateSelector() {
       phone: userPhone,
       profileImage: profileImageLoaded,
     })
-  }, [selectedTemplate, newsData, userName, userPhone, profileImageLoaded])
+  }, [selectedTemplate, newsData, userName, userPhone, profileImageLoaded, isMobile])
 
   useEffect(() => {
     if (newsData.length === 0) return
@@ -250,40 +261,68 @@ export default function NewsTemplateSelector() {
       <section className="py-8 px-4 bg-white">
         <div className="max-w-[1400px] mx-auto">
           <div className="flex flex-col lg:flex-row gap-6">
-            <div className="lg:w-[280px] shrink-0">
+            <div className={isMobile ? "w-full" : "lg:w-[280px] shrink-0"}>
               <h3 className="text-lg font-bold mb-3 flex items-center gap-2">
                 <span className="w-1 h-5 bg-black rounded-full" />
                 템플릿 선택
               </h3>
-              <div className="grid grid-cols-3 gap-2">
-                {TEMPLATES.map((template) => (
-                  <button
-                    key={template.id}
-                    onClick={() => setSelectedTemplate(template.id)}
-                    className={`relative overflow-hidden rounded-lg border-2 transition-all duration-200 p-1 ${
-                      selectedTemplate === template.id
-                        ? "border-black shadow-lg"
-                        : "border-gray-200 hover:border-gray-400"
-                    }`}
-                    style={{ background: template.previewBg }}
-                  >
-                    {/* 미니 프리뷰 캔버스 */}
-                    <div className="flex items-center justify-center">
-                      <canvas ref={setMiniCanvasRef(template.id)} className="rounded" />
-                    </div>
-                    {/* 템플릿 이름 */}
-                    <p className="text-[9px] font-bold text-center mt-1 text-white drop-shadow-md truncate px-1">
-                      {template.name}
-                    </p>
-                    {/* 선택 표시 */}
-                    {selectedTemplate === template.id && (
-                      <div className="absolute top-1 right-1 w-4 h-4 bg-black rounded-full flex items-center justify-center">
-                        <span className="text-white text-[8px]">✓</span>
+              {isMobile ? (
+                /* 모바일: 가로 스크롤 */
+                <div className="flex gap-3 overflow-x-auto pb-3 -mx-4 px-4 scrollbar-hide">
+                  {TEMPLATES.map((template) => (
+                    <button
+                      key={template.id}
+                      onClick={() => setSelectedTemplate(template.id)}
+                      className={`relative flex-shrink-0 overflow-hidden rounded-xl border-2 transition-all duration-200 p-2 ${
+                        selectedTemplate === template.id
+                          ? "border-black shadow-lg scale-105"
+                          : "border-gray-200"
+                      }`}
+                      style={{ background: template.previewBg, width: "80px" }}
+                    >
+                      <div className="flex items-center justify-center">
+                        <canvas ref={setMiniCanvasRef(template.id)} className="rounded" />
                       </div>
-                    )}
-                  </button>
-                ))}
-              </div>
+                      <p className="text-[10px] font-bold text-center mt-1 text-white drop-shadow-md truncate">
+                        {template.name}
+                      </p>
+                      {selectedTemplate === template.id && (
+                        <div className="absolute top-1 right-1 w-5 h-5 bg-black rounded-full flex items-center justify-center">
+                          <span className="text-white text-[10px]">✓</span>
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                /* PC: 2열 그리드 */
+                <div className="grid grid-cols-2 gap-3">
+                  {TEMPLATES.map((template) => (
+                    <button
+                      key={template.id}
+                      onClick={() => setSelectedTemplate(template.id)}
+                      className={`relative overflow-hidden rounded-xl border-2 transition-all duration-200 p-2 ${
+                        selectedTemplate === template.id
+                          ? "border-black shadow-lg"
+                          : "border-gray-200 hover:border-gray-400"
+                      }`}
+                      style={{ background: template.previewBg }}
+                    >
+                      <div className="flex items-center justify-center">
+                        <canvas ref={setMiniCanvasRef(template.id)} className="rounded" />
+                      </div>
+                      <p className="text-[10px] font-bold text-center mt-2 text-white drop-shadow-md truncate px-1">
+                        {template.name}
+                      </p>
+                      {selectedTemplate === template.id && (
+                        <div className="absolute top-2 right-2 w-5 h-5 bg-black rounded-full flex items-center justify-center">
+                          <span className="text-white text-[10px]">✓</span>
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="flex-1 flex flex-col">
@@ -291,32 +330,45 @@ export default function NewsTemplateSelector() {
                 <span className="w-1 h-5 bg-black rounded-full" />
                 미리보기
               </h3>
-              <div
-                className="bg-gray-200 rounded-xl flex items-center justify-center"
-                style={{
-                  padding: isMobile ? "5%" : "3%",
-                  maxHeight: isMobile ? "none" : "580px",
-                }}
-              >
-                <canvas
-                  ref={canvasRef}
-                  className="rounded-lg shadow-2xl"
-                  style={{
-                    maxHeight: isMobile ? "500px" : "540px",
-                    maxWidth: "100%",
-                    width: "auto",
-                    height: "auto",
-                  }}
-                />
-              </div>
-              <div className="mt-4 flex justify-center">
-                <Button
-                  onClick={handleDownload}
-                  className="bg-black hover:bg-gray-800 text-white px-10 py-4 text-sm font-bold rounded-full shadow-lg hover:shadow-xl transition-all"
-                >
-                  이미지 다운로드 (PNG)
-                </Button>
-              </div>
+              {isMobile ? (
+                /* 모바일: 풀 너비 중앙 정렬 */
+                <div className="bg-gray-200 rounded-xl p-4 flex flex-col items-center">
+                  <canvas ref={canvasRef} className="rounded-lg shadow-2xl" />
+                  <Button
+                    onClick={handleDownload}
+                    className="mt-4 bg-black hover:bg-gray-800 text-white px-8 py-3 text-sm font-bold rounded-full shadow-lg"
+                  >
+                    이미지 다운로드 (PNG)
+                  </Button>
+                </div>
+              ) : (
+                /* PC: 컴팩트 레이아웃 - 가로 배치 */
+                <div className="bg-gray-100 rounded-xl p-6 flex items-start gap-8">
+                  <div className="shrink-0">
+                    <canvas ref={canvasRef} className="rounded-lg shadow-xl" />
+                  </div>
+                  <div className="flex-1 flex flex-col justify-between min-h-[400px]">
+                    <div>
+                      <h4 className="text-xl font-bold mb-2">오늘의 뉴스 템플릿</h4>
+                      <p className="text-gray-600 text-sm mb-4">
+                        선택한 템플릿으로 생성된 뉴스 이미지입니다.<br />
+                        다운로드하여 고객에게 바로 전송하세요.
+                      </p>
+                      <div className="space-y-2 text-sm text-gray-500">
+                        <p>• 이미지 크기: 540 x 960px (9:16)</p>
+                        <p>• 포맷: PNG (고화질)</p>
+                        <p>• 매일 오후 9시 자동 업데이트</p>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={handleDownload}
+                      className="bg-black hover:bg-gray-800 text-white px-10 py-4 text-sm font-bold rounded-full shadow-lg hover:shadow-xl transition-all w-full"
+                    >
+                      이미지 다운로드 (PNG)
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
