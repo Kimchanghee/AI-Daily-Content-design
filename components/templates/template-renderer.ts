@@ -131,27 +131,25 @@ export const renderCityNight = (
     ctx.fillStyle = "rgba(15, 21, 37, 0.9)"
   })
 
-  // 프로필 영역
-  const pX = 70,
-    pY = 55,
-    pR = 40
+  // 프로필 영역 - 간격 개선
+  const pX = 55,
+    pY = 50,
+    pR = 32
   ctx.beginPath()
-  ctx.arc(pX, pY, pR + 3, 0, Math.PI * 2)
+  ctx.arc(pX, pY, pR + 2, 0, Math.PI * 2)
   ctx.strokeStyle = "rgba(255,255,255,0.4)"
   ctx.lineWidth = 2
   ctx.stroke()
   drawProfile(ctx, pX, pY, pR, user.profileImage, "#4a5568")
 
+  // 이름과 전화번호를 세로로 배치
   ctx.fillStyle = "#ffffff"
-  ctx.font = "bold 20px 'Noto Sans KR', sans-serif"
-  ctx.fillText(user.name, 125, 45)
-  ctx.font = "14px sans-serif"
-  ctx.fillStyle = "#a0aec0"
-  ctx.fillText("사업단장", 125 + ctx.measureText(user.name).width + 10, 45)
+  ctx.font = "bold 18px 'Noto Sans KR', sans-serif"
+  ctx.fillText(user.name, 100, 42)
 
   ctx.fillStyle = "#48bb78"
-  ctx.font = "14px sans-serif"
-  ctx.fillText("📞 " + user.phone, 125, 70)
+  ctx.font = "13px sans-serif"
+  ctx.fillText("📞 " + user.phone, 100, 62)
 
   // 뉴스 카드
   const cardX = 20,
