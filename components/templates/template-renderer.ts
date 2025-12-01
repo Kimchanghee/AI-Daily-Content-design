@@ -38,53 +38,28 @@ const drawFullNewsItem = (
   maxWidth: number,
   isHighlight = false,
 ) => {
-  // 제목 (굵게, 크게)
+  // 제목 (굵게)
   ctx.fillStyle = isHighlight ? "#c53030" : "#1a202c"
-  ctx.font = isHighlight ? "bold 15px 'Noto Sans KR', sans-serif" : "bold 14px 'Noto Sans KR', sans-serif"
-  const title = truncateText(news.title, 38)
+  ctx.font = isHighlight ? "bold 14px 'Noto Sans KR', sans-serif" : "bold 13px 'Noto Sans KR', sans-serif"
+  const title = truncateText(news.title, 32)
   ctx.fillText("• " + title, x, y)
 
-  // 메타 정보: 언론사 | 기자명 | 발행일
+  // 메타 정보: 언론사 | 발행일
   ctx.fillStyle = "#718096"
-  ctx.font = "11px sans-serif"
-  const meta = `${news.source} | ${news.reporter} | ${news.publishedAt}`
-  ctx.fillText(meta, x + 12, y + 18)
+  ctx.font = "10px sans-serif"
+  const meta = `${news.source} | ${news.publishedAt}`
+  ctx.fillText(meta, x + 12, y + 16)
 
-  // 내용 요약 (최대 2줄로 축소하여 겹침 방지)
+  // 내용 요약 (1줄로 축소)
   if (news.summary) {
     ctx.fillStyle = "#4a5568"
-    ctx.font = "12px sans-serif"
-
-    const words = news.summary.split(" ")
-    let line = ""
-    let lineY = y + 35
-    let lineCount = 0
-    const maxLines = 2
-    const lineHeight = 16
-
-    for (let i = 0; i < words.length && lineCount < maxLines; i++) {
-      const testLine = line + words[i] + " "
-      const metrics = ctx.measureText(testLine)
-
-      if (metrics.width > maxWidth - 20 && i > 0) {
-        ctx.fillText(line.trim(), x + 12, lineY)
-        line = words[i] + " "
-        lineY += lineHeight
-        lineCount++
-      } else {
-        line = testLine
-      }
-    }
-
-    if (lineCount < maxLines && line.trim()) {
-      ctx.fillText(truncateText(line.trim(), 50), x + 12, lineY)
-      lineCount++
-    }
-
-    return 35 + lineCount * lineHeight + 10
+    ctx.font = "11px sans-serif"
+    const summary = truncateText(news.summary, 45)
+    ctx.fillText(summary, x + 12, y + 32)
+    return 50
   }
 
-  return 40
+  return 35
 }
 
 // 템플릿 1: 시티 나이트
@@ -177,12 +152,12 @@ export const renderCityNight = (
   ctx.lineTo(cardX + cardW - 25, cardY + 52)
   ctx.stroke()
 
-  let y = cardY + 75
-  const maxNewsY = cardY + cardH - 30
-  news.slice(0, 8).forEach((item, i) => {
-    if (y > maxNewsY) return
-    const lineH = drawFullNewsItem(ctx, item, cardX + 25, y, cardW - 50, i < 3)
-    y += lineH
+  let y = cardY + 70
+  const maxNewsY = cardY + cardH - 20
+  news.slice(0, 10).forEach((item, i) => {
+    if (y + 50 > maxNewsY) return
+    const lineH = drawFullNewsItem(ctx, item, cardX + 25, y, cardW - 50, i < 2)
+    y += lineH + 5
   })
 
   // 주식 정보
@@ -290,12 +265,12 @@ export const renderLuxuryGold = (
   ctx.fillText(getDateString(), width / 2, cardY + 50)
   ctx.textAlign = "left"
 
-  let y = cardY + 75
-  const maxNewsY = cardY + cardH - 30
-  news.slice(0, 6).forEach((item, i) => {
-    if (y > maxNewsY) return
+  let y = cardY + 70
+  const maxNewsY = cardY + cardH - 20
+  news.slice(0, 10).forEach((item, i) => {
+    if (y + 50 > maxNewsY) return
     const lineH = drawFullNewsItem(ctx, item, cardX + 20, y, cardW - 40, i < 2)
-    y += lineH
+    y += lineH + 5
   })
 
   // 하단 주식
@@ -372,12 +347,12 @@ export const renderOceanBlue = (
   ctx.font = "bold 18px sans-serif"
   ctx.fillText("📰 Today's News", 35, 145)
 
-  let y = 175
-  const maxNewsY = height - 100
-  news.slice(0, 7).forEach((item, i) => {
-    if (y > maxNewsY) return
-    const lineH = drawFullNewsItem(ctx, item, 35, y, width - 70, i < 3)
-    y += lineH
+  let y = 170
+  const maxNewsY = height - 90
+  news.slice(0, 10).forEach((item, i) => {
+    if (y + 50 > maxNewsY) return
+    const lineH = drawFullNewsItem(ctx, item, 35, y, width - 70, i < 2)
+    y += lineH + 5
   })
 
   // 주식
@@ -457,12 +432,12 @@ export const renderForestGreen = (
   ctx.font = "bold 18px sans-serif"
   ctx.fillText("Today's News", 58, 135)
 
-  let y = 165
-  const maxNewsY = height - 95
-  news.slice(0, 7).forEach((item, i) => {
-    if (y > maxNewsY) return
-    const lineH = drawFullNewsItem(ctx, item, 58, y, width - 100, i < 3)
-    y += lineH
+  let y = 160
+  const maxNewsY = height - 80
+  news.slice(0, 10).forEach((item, i) => {
+    if (y + 50 > maxNewsY) return
+    const lineH = drawFullNewsItem(ctx, item, 58, y, width - 100, i < 2)
+    y += lineH + 5
   })
 
   // 하단 주식
@@ -542,12 +517,12 @@ export const renderSunsetWarm = (
   ctx.lineTo(width - 38, 152)
   ctx.stroke()
 
-  let y = 175
-  const maxNewsY = height - 95
-  news.slice(0, 7).forEach((item, i) => {
-    if (y > maxNewsY) return
+  let y = 170
+  const maxNewsY = height - 80
+  news.slice(0, 10).forEach((item, i) => {
+    if (y + 50 > maxNewsY) return
     const lineH = drawFullNewsItem(ctx, item, 38, y, width - 76, i < 2)
-    y += lineH
+    y += lineH + 5
   })
 
   // 주식
@@ -610,12 +585,12 @@ export const renderMinimalMono = (
   ctx.lineTo(170, 135)
   ctx.stroke()
 
-  let y = 160
-  const maxNewsY = height - 85
-  news.slice(0, 7).forEach((item, i) => {
-    if (y > maxNewsY) return
-    const lineH = drawFullNewsItem(ctx, item, 28, y, width - 56, i < 3)
-    y += lineH
+  let y = 155
+  const maxNewsY = height - 80
+  news.slice(0, 10).forEach((item, i) => {
+    if (y + 50 > maxNewsY) return
+    const lineH = drawFullNewsItem(ctx, item, 28, y, width - 56, i < 2)
+    y += lineH + 5
   })
 
   // 하단 검정 바
