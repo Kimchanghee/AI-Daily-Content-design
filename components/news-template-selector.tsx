@@ -99,9 +99,9 @@ export default function NewsTemplateSelector() {
       canvas.style.width = `${mobileWidth}px`
       canvas.style.height = `${mobileWidth * (960 / 540)}px`
     } else {
-      // PC: 고정 크기 300x533 (9:16 비율)
-      canvas.style.width = "300px"
-      canvas.style.height = "533px"
+      // PC: 글자가 잘 보이도록 크기 확대 (405x720, 9:16 비율)
+      canvas.style.width = "405px"
+      canvas.style.height = "720px"
     }
 
     ctx.scale(dpr, dpr)
@@ -340,30 +340,21 @@ export default function NewsTemplateSelector() {
                   </Button>
                 </div>
               ) : (
-                /* PC: 컴팩트 레이아웃 - 가로 배치 */
-                <div className="bg-gray-100 rounded-xl p-6 flex items-start gap-8">
-                  <div className="shrink-0">
+                /* PC: 미리보기 중심 레이아웃 */
+                <div className="bg-gray-100 rounded-xl p-6">
+                  <div className="flex flex-col items-center">
                     <canvas ref={canvasRef} className="rounded-lg shadow-xl" />
-                  </div>
-                  <div className="flex-1 flex flex-col justify-between min-h-[400px]">
-                    <div>
-                      <h4 className="text-xl font-bold mb-2">오늘의 뉴스 템플릿</h4>
-                      <p className="text-gray-600 text-sm mb-4">
-                        선택한 템플릿으로 생성된 뉴스 이미지입니다.<br />
-                        다운로드하여 고객에게 바로 전송하세요.
+                    <div className="mt-6 w-full max-w-md">
+                      <Button
+                        onClick={handleDownload}
+                        className="bg-black hover:bg-gray-800 text-white px-10 py-4 text-sm font-bold rounded-full shadow-lg hover:shadow-xl transition-all w-full"
+                      >
+                        이미지 다운로드 (PNG)
+                      </Button>
+                      <p className="text-center text-xs text-gray-500 mt-3">
+                        540 x 960px (9:16) • PNG 고화질 • 매일 오후 9시 업데이트
                       </p>
-                      <div className="space-y-2 text-sm text-gray-500">
-                        <p>• 이미지 크기: 540 x 960px (9:16)</p>
-                        <p>• 포맷: PNG (고화질)</p>
-                        <p>• 매일 오후 9시 자동 업데이트</p>
-                      </div>
                     </div>
-                    <Button
-                      onClick={handleDownload}
-                      className="bg-black hover:bg-gray-800 text-white px-10 py-4 text-sm font-bold rounded-full shadow-lg hover:shadow-xl transition-all w-full"
-                    >
-                      이미지 다운로드 (PNG)
-                    </Button>
                   </div>
                 </div>
               )}
