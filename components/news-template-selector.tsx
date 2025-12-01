@@ -341,22 +341,22 @@ export default function NewsTemplateSelector() {
                 </div>
               ) : (
                 /* PC: 미리보기 중심 레이아웃 */
-                <div className="bg-gray-100 rounded-xl p-6">
-                  <div className="flex flex-col items-center">
+                <>
+                  <div className="bg-gray-100 rounded-xl p-6 flex justify-center">
                     <canvas ref={canvasRef} className="rounded-lg shadow-xl" />
-                    <div className="mt-6 w-full max-w-md">
-                      <Button
-                        onClick={handleDownload}
-                        className="bg-black hover:bg-gray-800 text-white px-10 py-4 text-sm font-bold rounded-full shadow-lg hover:shadow-xl transition-all w-full"
-                      >
-                        이미지 다운로드 (PNG)
-                      </Button>
-                      <p className="text-center text-xs text-gray-500 mt-3">
-                        540 x 960px (9:16) • PNG 고화질 • 매일 오후 9시 업데이트
-                      </p>
-                    </div>
                   </div>
-                </div>
+                  <div className="mt-6 flex flex-col items-center">
+                    <Button
+                      onClick={handleDownload}
+                      className="bg-black hover:bg-gray-800 text-white px-10 py-4 text-sm font-bold rounded-full shadow-lg hover:shadow-xl transition-all"
+                    >
+                      이미지 다운로드 (PNG)
+                    </Button>
+                    <p className="text-center text-xs text-gray-500 mt-3">
+                      540 x 960px (9:16) • PNG 고화질 • 매일 오후 9시 업데이트
+                    </p>
+                  </div>
+                </>
               )}
             </div>
           </div>
