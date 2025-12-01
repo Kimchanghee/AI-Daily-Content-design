@@ -11,8 +11,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Sparkles } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 
-const supabase = createClient()
-
 export default function UpdatePasswordPage() {
   const router = useRouter()
   const [password, setPassword] = useState("")
@@ -24,6 +22,7 @@ export default function UpdatePasswordPage() {
   useEffect(() => {
     // 비밀번호 재설정 세션 확인
     const checkSession = async () => {
+      const supabase = createClient()
       const { data } = await supabase.auth.getSession()
       setValidSession(!!data.session)
     }
@@ -47,6 +46,7 @@ export default function UpdatePasswordPage() {
     setLoading(true)
 
     try {
+      const supabase = createClient()
       const { error: updateError } = await supabase.auth.updateUser({
         password: password,
       })
