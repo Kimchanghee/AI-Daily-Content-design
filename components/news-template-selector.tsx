@@ -1,94 +1,41 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
+import { useRouter } from "next/navigation"
+import { TEMPLATES, type NewsItem } from "@/components/templates/template-types"
+import { renderTemplate } from "@/components/templates/template-renderer"
 
-interface NewsItem {
-  id: string
-  category: string
-  title: string
-  summary: string
-  source: string
-  timestamp: string
-  url?: string
-}
-
-interface Template {
-  id: string
-  name: string
-  preview: string
-  description: string
-}
-
-interface UserInfo {
-  name: string
-  company: string
-  phone: string
-  message: string
-}
-
-const templates: Template[] = [
-  {
-    id: "classic",
-    name: "클래식",
-    preview: "/classic-news-template.jpg",
-    description: "깔끔하고 전문적인 기본 템플릿",
-  },
-  {
-    id: "modern",
-    name: "모던",
-    preview: "/modern-news-template.jpg",
-    description: "현대적이고 세련된 디자인",
-  },
-  {
-    id: "premium",
-    name: "프리미엄",
-    preview: "/premium-business-template.jpg",
-    description: "고급스러운 비즈니스 템플릿",
-  },
-]
+const DEFAULT_AVATAR =
+  "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+PGNpcmNsZSBjeD0iNjAiIGN5PSI2MCIgcj0iNjAiIGZpbGw9IiNlNWU3ZWIiLz48Y2lyY2xlIGN4PSI2MCIgY3k9IjQ1IiByPSIyMCIgZmlsbD0iIzliYTFhYiIvPjxwYXRoIGQ9Ik0yNSAxMTBjMC0yNSAxNS00MCAzNS00MHMzNSAxNSAzNSA0MCIgZmlsbD0iIzliYTFhYiIvPjwvc3ZnPg=="
 
 export default function NewsTemplateSelector() {
-  const [selectedTemplate, setSelectedTemplate] = useState<string>("classic")
+  const router = useRouter()
+  const [selectedTemplate, setSelectedTemplate] = useState("city-night")
   const [newsData, setNewsData] = useState<NewsItem[]>([])
-  const [loading, setLoading] = useState(false)
-  const [previewMode, setPreviewMode] = useState(false)
-  const [lastUpdate, setLastUpdate] = useState<Date | null>(null)
-  const [userInfo, setUserInfo] = useState<UserInfo>({
-    name: "",
-    company: "",
-    phone: "",
-    message: "",
-  })
   const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [savedTemplates, setSavedTemplates] = useState<any[]>([])
+  const [userName, setUserName] = useState("")
+  const [userPhone, setUserPhone] = useState("")
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [profileImageLoaded, setProfileImageLoaded] = useState<HTMLImageElement | null>(null)
+  const templateListRef = useRef<HTMLDivElement>(null)
+  const [templateListHeight, setTemplateListHeight] = useState(600)
+
+  const CANVAS_WIDTH = 540
+  const CANVAS_HEIGHT = 960
 
   const fetchNews = useCallback(async () => {
-    setLoading(true)
     try {
       const response = await fetch("/api/news", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
       })
-
       const result = await response.json()
-
       if (result.success) {
         setNewsData(result.data)
-        setLastUpdate(new Date())
-        console.log("[v0] 뉴스 업데이트 성공:", result.data.length, "개")
-      } else {
-        console.error("[v0] 뉴스 가져오기 실패:", result.error)
-        alert(`뉴스를 가져오는데 실패했습니다: ${result.error}`)
       }
     } catch (error) {
-      console.error("[v0] 뉴스 가져오기 오류:", error)
-      alert("뉴스를 가져오는데 실패했습니다")
-    } finally {
-      setLoading(false)
+      console.error("뉴스 가져오기 오류:", error)
     }
   }, [])
 
@@ -101,412 +48,291 @@ export default function NewsTemplateSelector() {
           data: { user },
         } = await supabase.auth.getUser()
         setIsLoggedIn(!!user)
-
         if (user) {
-          // 저장된 사용자 정보 불러오기
-          const savedInfo = localStorage.getItem(`userInfo_${user.id}`)
-          if (savedInfo) {
-            setUserInfo(JSON.parse(savedInfo))
-          }
+          setUserName(user.user_metadata?.name || user.user_metadata?.full_name || "홍길동")
+          setUserPhone(user.user_metadata?.phone || "010-0000-0000")
+          const profileImg = user.user_metadata?.profile_image || DEFAULT_AVATAR
+          const img = new Image()
+          img.crossOrigin = "anonymous"
+          img.onload = () => setProfileImageLoaded(img)
+          img.src = profileImg
+        } else {
+          const img = new Image()
+          img.crossOrigin = "anonymous"
+          img.onload = () => setProfileImageLoaded(img)
+          img.src = DEFAULT_AVATAR
         }
-      } catch (error) {
-        console.log("[v0] 인증 체크 실패:", error)
+      } catch {
         setIsLoggedIn(false)
+        const img = new Image()
+        img.onload = () => setProfileImageLoaded(img)
+        img.src = DEFAULT_AVATAR
       }
     }
     checkAuth()
-  }, [])
-
-  useEffect(() => {
-    const checkAndUpdate = () => {
-      const now = new Date()
-      const hour = now.getHours()
-
-      // 오전 9시 ~ 오후 11시 59분 사이에만 작동
-      if (hour >= 9 && hour <= 23) {
-        console.log("[v0] 자동 업데이트 실행:", now.toLocaleString("ko-KR"))
-        fetchNews()
-      } else {
-        console.log("[v0] 업데이트 시간 아님 (9시~23시만 작동):", now.toLocaleString("ko-KR"))
-      }
-    }
-
-    // 첫 로드시 즉시 실행
-    checkAndUpdate()
-
-    // 1시간(3600000ms)마다 실행
-    const interval = setInterval(checkAndUpdate, 3600000)
-
-    return () => clearInterval(interval)
+    fetchNews()
   }, [fetchNews])
 
-  const handleDownload = () => {
-    console.log("[v0] 이미지 다운로드:", selectedTemplate)
-    alert("이미지가 다운로드됩니다.")
-  }
-
-  const handleSaveTemplate = async () => {
-    if (!isLoggedIn) {
-      alert("로그인이 필요합니다")
-      window.location.href = "/auth/login"
-      return
-    }
-
-    if (!userInfo.name || !userInfo.company) {
-      alert("이름과 회사명을 입력해주세요")
-      return
-    }
-
-    const templateData = {
-      id: Date.now().toString(),
-      templateId: selectedTemplate,
-      userInfo,
-      newsData,
-      createdAt: new Date().toISOString(),
-    }
-
-    // localStorage에 저장
-    const saved = JSON.parse(localStorage.getItem("savedTemplates") || "[]")
-    saved.push(templateData)
-    localStorage.setItem("savedTemplates", JSON.stringify(saved))
-    setSavedTemplates(saved)
-
-    console.log("[v0] 템플릿 저장 완료:", templateData)
-    alert("템플릿이 저장되었습니다!")
-  }
-
+  // 템플릿 리스트 높이 측정
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem("savedTemplates") || "[]")
-    setSavedTemplates(saved)
+    if (templateListRef.current) {
+      setTemplateListHeight(templateListRef.current.offsetHeight)
+    }
   }, [])
 
+  // 캔버스 렌더링
+  useEffect(() => {
+    if (!canvasRef.current || newsData.length === 0) return
+
+    const canvas = canvasRef.current
+    const ctx = canvas.getContext("2d")
+    if (!ctx) return
+
+    const dpr = 2
+    canvas.width = CANVAS_WIDTH * dpr
+    canvas.height = CANVAS_HEIGHT * dpr
+    canvas.style.width = `100%`
+    canvas.style.height = `auto`
+    ctx.scale(dpr, dpr)
+
+    renderTemplate(selectedTemplate, ctx, CANVAS_WIDTH, CANVAS_HEIGHT, newsData, {
+      name: userName || "홍길동",
+      phone: userPhone || "010-0000-0000",
+      profileImage: profileImageLoaded,
+    })
+  }, [selectedTemplate, newsData, userName, userPhone, profileImageLoaded])
+
+  const handleDownload = () => {
+    if (!isLoggedIn) {
+      alert("로그인 후 3일 무료 체험을 시작하세요!\n\n지금 가입하시면 모든 템플릿을 무료로 이용하실 수 있습니다.")
+      router.push("/auth/login")
+      return
+    }
+
+    if (!canvasRef.current) return
+    const link = document.createElement("a")
+    link.download = `daily-news-${new Date().toISOString().split("T")[0]}.png`
+    link.href = canvasRef.current.toDataURL("image/png", 1.0)
+    link.click()
+  }
+
   return (
-    <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-      <header className="flex justify-between items-center mb-16 pb-6 border-b border-border/50">
-        <div className="flex items-center gap-4">
-          <h1 className="text-3xl font-bold tracking-tight">DM</h1>
-        </div>
-        <div className="flex items-center gap-3">
-          {isLoggedIn ? (
-            <>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => (window.location.href = "/dashboard")}
-                className="font-medium"
-              >
-                대시보드
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => (window.location.href = "/settings")}
-                className="font-medium"
-              >
-                설정
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => (window.location.href = "/auth/login")}
-                className="font-medium"
-              >
-                로그인
-              </Button>
-              <Button
-                size="sm"
-                onClick={() => (window.location.href = "/auth/signup")}
-                className="bg-foreground text-background hover:bg-foreground/90 font-medium"
-              >
-                회원가입
-              </Button>
-            </>
-          )}
+    <div className="min-h-screen bg-white">
+      {/* 헤더 */}
+      <header className="bg-black text-white py-3 px-4">
+        <div className="max-w-[1400px] mx-auto flex justify-between items-center">
+          <h1 className="text-lg font-bold tracking-tight">DailyNews</h1>
+          <div className="flex items-center gap-3">
+            {isLoggedIn ? (
+              <>
+                <span className="text-sm text-gray-300">{userName}님</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-white text-white hover:bg-white hover:text-black text-xs bg-transparent"
+                  onClick={() => router.push("/dashboard")}
+                >
+                  마이페이지
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-white hover:bg-white/10 text-xs"
+                  onClick={() => router.push("/auth/login")}
+                >
+                  로그인
+                </Button>
+                <Button
+                  size="sm"
+                  className="bg-white text-black hover:bg-gray-200 text-xs"
+                  onClick={() => router.push("/auth/signup")}
+                >
+                  회원가입
+                </Button>
+              </>
+            )}
+          </div>
         </div>
       </header>
 
-      <div className="text-center mb-20">
-        <h1 className="section-title mb-6">보험사 데일리 메시지</h1>
-        <p className="section-subtitle max-w-2xl mx-auto mb-8">
-          매일 최신 뉴스를 자동으로 수집하고,
-          <br />
-          고급스러운 템플릿으로 고객에게 전달하세요
-        </p>
-        <div className="inline-flex items-center gap-2 px-6 py-2.5 bg-foreground text-background rounded-sm text-sm font-medium tracking-wide">
-          3일 무료 체험
+      {/* 배너 */}
+      <section className="relative bg-black text-white overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-800" />
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-white/5 rounded-full blur-3xl" />
         </div>
-      </div>
-
-      <section className="mb-20">
-        <h2 className="text-3xl font-bold mb-8 tracking-tight">템플릿 선택</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {templates.map((template) => (
-            <Card
-              key={template.id}
-              className={`cursor-pointer transition-all duration-300 hover:shadow-lg ${
-                selectedTemplate === template.id ? "ring-2 ring-foreground shadow-md" : "premium-card"
-              }`}
-              onClick={() => setSelectedTemplate(template.id)}
-            >
-              <div className="p-6">
-                <img
-                  src={template.preview || "/placeholder.svg"}
-                  alt={template.name}
-                  className="w-full h-52 object-cover rounded-sm mb-6 grayscale hover:grayscale-0 transition-all duration-500"
-                />
-                <h3 className="font-bold text-xl mb-2 tracking-tight">{template.name}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{template.description}</p>
-                {selectedTemplate === template.id && (
-                  <div className="mt-4 text-sm font-medium">
-                    <span className="inline-block px-3 py-1 bg-foreground text-background rounded-sm">선택됨</span>
-                  </div>
-                )}
-              </div>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      {/* 오늘의 뉴스 */}
-      <section className="mb-20">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-          <div>
-            <h2 className="text-3xl font-bold tracking-tight">오늘의 뉴스</h2>
-            <p className="text-sm text-muted-foreground mt-2 font-medium">
-              {loading ? "뉴스를 가져오는 중..." : "실시간 뉴스 수집 완료"}
+        <div className="relative max-w-[1400px] mx-auto px-4 py-16 md:py-20">
+          <div className="text-center max-w-3xl mx-auto">
+            <p className="text-gray-400 text-sm mb-4 tracking-widest uppercase">
+              Smart News Service for Insurance Professionals
             </p>
-          </div>
-          <Button
-            onClick={fetchNews}
-            disabled={loading}
-            className="bg-foreground text-background hover:bg-foreground/90 font-medium"
-          >
-            {loading ? "로딩 중..." : "뉴스 새로고침"}
-          </Button>
-        </div>
-
-        {lastUpdate && (
-          <div className="text-sm text-muted-foreground mb-4">
-            마지막 업데이트: {lastUpdate.toLocaleString("ko-KR")} | 자동 업데이트: 오전 9시 ~ 오후 11:59분 (1시간마다)
-          </div>
-        )}
-
-        {newsData.length === 0 && !loading && (
-          <Card className="p-8 text-center">
-            <p className="text-muted-foreground">뉴스 새로고침 버튼을 눌러 최신 뉴스를 가져오세요</p>
-          </Card>
-        )}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {newsData.map((news) => (
-            <Card key={news.id} className="p-6 premium-card hover:shadow-md transition-all duration-300">
-              <div className="mb-3">
-                <span className="inline-block px-3 py-1 bg-foreground/5 text-foreground text-xs font-medium rounded-sm tracking-wide">
-                  {news.category}
-                </span>
-              </div>
-              <h3 className="font-bold text-lg mb-3 leading-snug tracking-tight">{news.title}</h3>
-              <p className="text-sm text-muted-foreground mb-4 leading-relaxed">{news.summary}</p>
-              <div className="flex justify-between items-center text-xs text-muted-foreground font-medium">
-                <span>{news.source}</span>
-                <span>{new Date(news.timestamp).toLocaleDateString("ko-KR")}</span>
-              </div>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      {/* 미리보기 및 다운로드 */}
-      <section className="mb-20">
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button
-            size="lg"
-            onClick={() => setPreviewMode(!previewMode)}
-            variant="outline"
-            disabled={newsData.length === 0}
-            className="font-medium"
-          >
-            {previewMode ? "편집 모드" : "미리보기"}
-          </Button>
-          {isLoggedIn && (
-            <Button
-              size="lg"
-              onClick={handleSaveTemplate}
-              disabled={newsData.length === 0}
-              variant="outline"
-              className="font-medium bg-transparent"
-            >
-              템플릿 저장
-            </Button>
-          )}
-          <Button
-            size="lg"
-            onClick={handleDownload}
-            disabled={newsData.length === 0}
-            className="bg-foreground text-background hover:bg-foreground/90 font-medium"
-          >
-            이미지 다운로드
-          </Button>
-        </div>
-
-        {previewMode && (
-          <Card className="mt-8 p-6">
-            <h3 className="text-xl font-bold mb-4">미리보기</h3>
-            <div className="bg-muted rounded-lg p-8">
-              <div className="mb-6 text-center">
-                <p className="text-lg font-bold">{templates.find((t) => t.id === selectedTemplate)?.name} 템플릿</p>
-                {isLoggedIn && userInfo.name && (
-                  <div className="mt-4 space-y-2 text-sm">
-                    <p>
-                      <strong>이름:</strong> {userInfo.name}
-                    </p>
-                    <p>
-                      <strong>회사:</strong> {userInfo.company}
-                    </p>
-                    <p>
-                      <strong>연락처:</strong> {userInfo.phone}
-                    </p>
-                    {userInfo.message && (
-                      <p className="mt-4 p-4 bg-background rounded">
-                        <strong>메시지:</strong> {userInfo.message}
-                      </p>
-                    )}
-                  </div>
-                )}
-              </div>
-              <div className="border-t pt-4">
-                <p className="font-bold mb-2">포함된 뉴스 ({newsData.length}개)</p>
-                <ul className="space-y-1 text-sm">
-                  {newsData.slice(0, 5).map((news) => (
-                    <li key={news.id} className="flex items-start gap-2">
-                      <span className="text-primary">•</span>
-                      <span>
-                        [{news.category}] {news.title}
-                      </span>
-                    </li>
-                  ))}
-                  {newsData.length > 5 && <li className="text-muted-foreground">... 외 {newsData.length - 5}개</li>}
-                </ul>
-              </div>
+            <h2 className="text-3xl md:text-5xl font-bold mb-6 leading-tight tracking-tight">
+              매일 아침 30분,
+              <br />
+              뉴스 정리에 쓰고 계신가요?
+            </h2>
+            <p className="text-gray-300 text-lg md:text-xl mb-8 leading-relaxed">
+              클릭 한 번으로 고객에게 보낼
+              <br className="md:hidden" />
+              프로페셔널한 뉴스 이미지를 받아보세요
+            </p>
+            <div className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-full text-sm font-bold">
+              <span className="text-lg">🎁</span>
+              지금 가입하면 3일 무료 체험
             </div>
-          </Card>
-        )}
+          </div>
+        </div>
       </section>
 
-      {isLoggedIn && savedTemplates.length > 0 && (
-        <section className="mb-20">
-          <h2 className="text-2xl font-bold mb-4">저장된 템플릿</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {savedTemplates.map((saved) => (
-              <Card key={saved.id} className="p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <span className="text-sm font-medium">{templates.find((t) => t.id === saved.templateId)?.name}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {new Date(saved.createdAt).toLocaleDateString("ko-KR")}
-                  </span>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  {saved.userInfo.name} | {saved.userInfo.company}
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">{saved.newsData.length}개 뉴스 포함</p>
-              </Card>
+      {/* 요일별 토픽 안내 */}
+      <section className="py-6 bg-gray-50 border-b border-gray-200">
+        <div className="max-w-[1400px] mx-auto px-4">
+          <p className="text-center text-xs text-gray-500 mb-4">
+            매일 오후 9시, 요일별 토픽 뉴스가 자동 업데이트됩니다
+          </p>
+          <div className="flex justify-center items-center gap-3 flex-wrap">
+            {[
+              { day: "월", topic: "정치", color: "bg-red-500" },
+              { day: "화", topic: "경제", color: "bg-blue-500" },
+              { day: "수", topic: "사회", color: "bg-green-500" },
+              { day: "목", topic: "생활/문화", color: "bg-purple-500" },
+              { day: "금", topic: "IT/과학", color: "bg-orange-500" },
+            ].map((item) => (
+              <div
+                key={item.day}
+                className="flex items-center gap-2 px-4 py-2 bg-white rounded-full border border-gray-200 shadow-sm"
+              >
+                <span
+                  className={`w-6 h-6 flex items-center justify-center ${item.color} text-white text-xs font-bold rounded-full`}
+                >
+                  {item.day}
+                </span>
+                <span className="text-gray-800 font-medium text-sm">{item.topic}</span>
+              </div>
             ))}
           </div>
-        </section>
-      )}
-
-      <section className="mb-20 py-20 bg-gradient-to-b from-muted/30 to-background -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-4 tracking-tight">서비스 가격</h2>
-          <p className="text-lg text-muted-foreground mb-12 leading-relaxed">
-            간편한 단일 요금제로 모든 기능을 이용하세요
-          </p>
-
-          <Card className="p-10 max-w-md mx-auto premium-card">
-            <div className="mb-6">
-              <div className="inline-block px-5 py-2 bg-foreground text-background rounded-sm text-sm font-medium tracking-wide mb-6">
-                3일 무료 체험
-              </div>
-              <h3 className="text-2xl font-bold mb-3 tracking-tight">프로 플랜</h3>
-              <div className="text-5xl font-bold mb-3 tracking-tight">
-                ₩49,000<span className="text-2xl text-muted-foreground font-normal">/월</span>
-              </div>
-            </div>
-
-            <ul className="space-y-4 text-left mb-8">
-              <li className="flex items-start gap-3">
-                <span className="text-foreground font-bold mt-0.5">✓</span>
-                <span className="leading-relaxed">실시간 뉴스 자동 수집 (6개 카테고리)</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-foreground font-bold mt-0.5">✓</span>
-                <span className="leading-relaxed">3가지 프리미엄 템플릿</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-foreground font-bold mt-0.5">✓</span>
-                <span className="leading-relaxed">무제한 템플릿 저장</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-foreground font-bold mt-0.5">✓</span>
-                <span className="leading-relaxed">이미지 다운로드</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-foreground font-bold mt-0.5">✓</span>
-                <span className="leading-relaxed">고객 정보 관리</span>
-              </li>
-            </ul>
-
-            <Button
-              size="lg"
-              className="w-full bg-foreground text-background hover:bg-foreground/90 font-medium"
-              onClick={() => (window.location.href = "/auth/signup")}
-            >
-              3일 무료 체험 시작
-            </Button>
-          </Card>
         </div>
       </section>
 
-      <footer className="mt-24 pt-12 border-t border-border/50">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
-          <div>
-            <h4 className="font-bold mb-4 tracking-tight">제품</h4>
-            <ul className="space-y-3 text-sm text-muted-foreground">
-              <li className="hover:text-foreground transition-colors cursor-pointer">기능</li>
-              <li className="hover:text-foreground transition-colors cursor-pointer">가격</li>
-              <li className="hover:text-foreground transition-colors cursor-pointer">템플릿</li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-bold mb-4 tracking-tight">회사</h4>
-            <ul className="space-y-3 text-sm text-muted-foreground">
-              <li className="hover:text-foreground transition-colors cursor-pointer">소개</li>
-              <li className="hover:text-foreground transition-colors cursor-pointer">블로그</li>
-              <li className="hover:text-foreground transition-colors cursor-pointer">채용</li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-bold mb-4 tracking-tight">법률</h4>
-            <ul className="space-y-3 text-sm text-muted-foreground">
-              <li className="hover:text-foreground transition-colors cursor-pointer">이용약관</li>
-              <li className="hover:text-foreground transition-colors cursor-pointer">개인정보처리방침</li>
-              <li className="hover:text-foreground transition-colors cursor-pointer">환불정책</li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-bold mb-4 tracking-tight">지원</h4>
-            <ul className="space-y-3 text-sm text-muted-foreground">
-              <li className="hover:text-foreground transition-colors cursor-pointer">고객센터</li>
-              <li className="hover:text-foreground transition-colors cursor-pointer">FAQ</li>
-              <li className="hover:text-foreground transition-colors cursor-pointer">문의하기</li>
-            </ul>
+      {/* 템플릿 선택 + 미리보기 */}
+      <section className="py-12 px-4 bg-white">
+        <div className="max-w-[1400px] mx-auto">
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* 좌측: 템플릿 선택 */}
+            <div className="lg:w-[420px] shrink-0" ref={templateListRef}>
+              <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+                <span className="w-1 h-6 bg-black rounded-full" />
+                템플릿 선택
+              </h3>
+              <div className="space-y-4">
+                {TEMPLATES.map((template) => (
+                  <button
+                    key={template.id}
+                    onClick={() => setSelectedTemplate(template.id)}
+                    className={`w-full text-left overflow-hidden rounded-2xl border-2 transition-all duration-300 ${
+                      selectedTemplate === template.id
+                        ? "border-black shadow-xl scale-[1.02]"
+                        : "border-gray-200 hover:border-gray-400 hover:shadow-md"
+                    }`}
+                  >
+                    <div className="h-28 w-full relative" style={{ background: template.previewBg }}>
+                      {/* 미니 프리뷰 */}
+                      <div className="absolute inset-0 flex items-center justify-between px-5">
+                        <div className="flex items-center gap-3">
+                          <div
+                            className="w-12 h-12 rounded-full border-2 flex items-center justify-center"
+                            style={{
+                              borderColor: template.accentColor,
+                              backgroundColor: "rgba(255,255,255,0.2)",
+                            }}
+                          >
+                            <span style={{ color: template.accentColor }} className="text-lg">
+                              👤
+                            </span>
+                          </div>
+                          <div>
+                            <p className="font-bold text-base" style={{ color: template.accentColor }}>
+                              {template.name}
+                            </p>
+                            <p className="text-xs opacity-80" style={{ color: template.accentColor }}>
+                              {template.description}
+                            </p>
+                          </div>
+                        </div>
+                        {/* 미니 뉴스 카드 */}
+                        <div
+                          className="w-24 h-16 rounded-lg flex flex-col justify-center px-2"
+                          style={{ backgroundColor: "rgba(255,255,255,0.9)" }}
+                        >
+                          <div className="w-full h-1.5 bg-gray-300 rounded mb-1" />
+                          <div className="w-3/4 h-1.5 bg-gray-200 rounded mb-1" />
+                          <div className="w-5/6 h-1.5 bg-gray-200 rounded" />
+                        </div>
+                      </div>
+                      {/* 선택 표시 */}
+                      {selectedTemplate === template.id && (
+                        <div className="absolute top-3 right-3 w-7 h-7 bg-black rounded-full flex items-center justify-center shadow-lg">
+                          <span className="text-white text-sm">✓</span>
+                        </div>
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 우측: 미리보기 */}
+            <div className="flex-1 flex flex-col">
+              <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+                <span className="w-1 h-6 bg-black rounded-full" />
+                미리보기
+              </h3>
+              {/* 미리보기 컨테이너 - 템플릿 리스트와 높이 동일 */}
+              <div
+                className="bg-gray-200 rounded-2xl flex items-center justify-center"
+                style={{
+                  height: `${Math.max(templateListHeight - 52, 600)}px`,
+                  padding: "7%",
+                }}
+              >
+                <canvas
+                  ref={canvasRef}
+                  className="rounded-xl shadow-2xl"
+                  style={{
+                    maxHeight: "100%",
+                    maxWidth: "100%",
+                    objectFit: "contain",
+                  }}
+                />
+              </div>
+              {/* 다운로드 버튼 */}
+              <div className="mt-6 flex justify-center">
+                <Button
+                  onClick={handleDownload}
+                  className="bg-black hover:bg-gray-800 text-white px-10 py-4 text-base font-bold rounded-full shadow-lg hover:shadow-xl transition-all"
+                >
+                  이미지 다운로드 (PNG)
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
-        <div className="text-center text-sm text-muted-foreground pt-8 border-t border-border/50">
-          <p className="tracking-wide">© 2025 보험사 데일리 메시지. All rights reserved.</p>
+      </section>
+
+      {/* 푸터 */}
+      <footer className="bg-gray-100 border-t border-gray-200 py-10">
+        <div className="max-w-[1400px] mx-auto px-4">
+          <div className="text-center text-sm text-gray-600 space-y-2">
+            <p className="font-bold text-gray-800 text-base">주식회사 데일리뉴스코리아</p>
+            <p>대표: 홍길동 | 사업자등록번호: 123-45-67890</p>
+            <p>주소: 서울특별시 강남구 테헤란로 123, 데일리빌딩 15층</p>
+            <p>고객센터: 02-1234-5678 | 이메일: support@dailynews.kr</p>
+            <p className="text-gray-400 pt-4">© 2025 DailyNews Korea. All rights reserved.</p>
+          </div>
         </div>
       </footer>
     </div>

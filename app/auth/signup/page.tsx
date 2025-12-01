@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -12,14 +12,31 @@ import { createClient } from "@/lib/supabase/client"
 
 const supabase = createClient()
 
+const DEFAULT_AVATAR =
+  "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+PGNpcmNsZSBjeD0iNjAiIGN5PSI2MCIgcj0iNjAiIGZpbGw9IiNlNWU3ZWIiLz48Y2lyY2xlIGN4PSI2MCIgY3k9IjQ1IiByPSIyMCIgZmlsbD0iIzliYTFhYiIvPjxwYXRoIGQ9Ik0yNSAxMTBjMC0yNSAxNS00MCAzNS00MHMzNSAxNSAzNSA0MCIgZmlsbD0iIzliYTFhYiIvPjwvc3ZnPg=="
+
 export default function SignupPage() {
   const router = useRouter()
   const [name, setName] = useState("")
+  const [phone, setPhone] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
+  const [profileImage, setProfileImage] = useState<string>(DEFAULT_AVATAR)
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setProfileImage(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -35,9 +52,12 @@ export default function SignupPage() {
       return
     }
 
-    setLoading(true)
+    if (!phone || phone.length < 10) {
+      setError("올바른 핸드폰 번호를 입력해주세요.")
+      return
+    }
 
-    console.log("[v0] Signup attempt for:", email)
+    setLoading(true)
 
     try {
       const { data, error: signUpError } = await supabase.auth.signUp({
@@ -50,34 +70,25 @@ export default function SignupPage() {
             name: name,
             full_name: name,
             display_name: name,
-            service_name: "AI Daily Content",
+            phone: phone,
+            profile_image: profileImage,
+            service_name: "DM 데일리 메시지",
           },
         },
       })
 
-      console.log("[v0] Signup response:", { data, error: signUpError })
-
       if (signUpError) {
-        console.error("[v0] Signup error:", signUpError)
         setError(signUpError.message)
         setLoading(false)
         return
       }
 
-      console.log("[v0] Signup successful")
-
-      // No need to manually insert - the trigger handles it when auth.users row is created
-
-      // Redirect based on whether session exists (email confirmation required or not)
       if (data.session) {
-        // Email confirmation disabled - direct login
         router.push("/dashboard")
       } else {
-        // Email confirmation required - show verification page
         router.push("/auth/verify-email")
       }
     } catch (err: any) {
-      console.error("[v0] Signup exception:", err)
       setError(err.message || "회원가입 중 오류가 발생했습니다.")
       setLoading(false)
     }
@@ -88,22 +99,46 @@ export default function SignupPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2 text-2xl font-bold">
-            <span className="text-4xl">✨</span>
-            <span className="text-foreground font-bold tracking-tight">보험사 데일리 메시지</span>
+            <span className="text-foreground font-bold tracking-tight">DM</span>
           </Link>
         </div>
 
         <Card>
           <CardHeader>
             <CardTitle>회원가입</CardTitle>
-            <CardDescription>무료로 가입하고 뉴스 생성을 시작하세요</CardDescription>
+            <CardDescription>3일 무료 체험으로 시작하세요</CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
               {error && <div className="p-3 text-sm text-foreground bg-muted rounded-lg border">{error}</div>}
 
               <div className="space-y-2">
-                <Label htmlFor="name">이름</Label>
+                <Label>프로필 사진</Label>
+                <div className="flex items-center gap-4">
+                  <div
+                    className="w-20 h-20 rounded-full bg-gray-200 overflow-hidden cursor-pointer border-2 border-dashed border-gray-300 hover:border-gray-400 transition-colors"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <img src={profileImage || "/placeholder.svg"} alt="프로필" className="w-full h-full object-cover" />
+                  </div>
+                  <div className="flex-1">
+                    <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
+                      사진 업로드
+                    </Button>
+                    <p className="text-xs text-gray-500 mt-1">없으면 기본 이미지가 사용됩니다</p>
+                  </div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="name">본명 *</Label>
                 <Input
                   id="name"
                   type="text"
@@ -115,7 +150,19 @@ export default function SignupPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email">이메일</Label>
+                <Label htmlFor="phone">핸드폰 번호 *</Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  placeholder="010-0000-0000"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="email">이메일 *</Label>
                 <Input
                   id="email"
                   type="email"
@@ -127,7 +174,7 @@ export default function SignupPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">비밀번호</Label>
+                <Label htmlFor="password">비밀번호 *</Label>
                 <Input
                   id="password"
                   type="password"
@@ -139,7 +186,7 @@ export default function SignupPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">비밀번호 확인</Label>
+                <Label htmlFor="confirmPassword">비밀번호 확인 *</Label>
                 <Input
                   id="confirmPassword"
                   type="password"
