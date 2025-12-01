@@ -189,11 +189,12 @@ export default function NewsTemplateSelector() {
                   로그인
                 </Button>
                 <Button
+                  variant="outline"
                   size="sm"
-                  className="bg-white text-black hover:bg-gray-200 text-sm font-bold"
+                  className="border-white text-white hover:bg-white hover:text-black text-sm bg-transparent"
                   onClick={() => router.push("/auth/signup")}
                 >
-                  무료 체험 시작
+                  회원가입
                 </Button>
               </>
             )}
