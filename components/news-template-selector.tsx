@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
+import { useRouter } from "next/navigation"
 import { TEMPLATES, type NewsItem } from "@/components/templates/template-types"
 import { renderTemplate, renderMiniPreview } from "@/components/templates/template-renderer"
 import Header from "@/components/news/Header"
@@ -15,6 +16,7 @@ const DEFAULT_AVATAR =
   "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+PGNpcmNsZSBjeD0iNjAiIGN5PSI2MCIgcj0iNjAiIGZpbGw9IiNlNWU3ZWIiLz48Y2lyY2xlIGN4PSI2MCIgY3k9IjQ1IiByPSIyMCIgZmlsbD0iIzliYTFhYiIvPjxwYXRoIGQ9Ik0yNSAxMTBjMC0yNSAxNS00MCAzNS00MHMzNSAxNSAzNSA0MCIgZmlsbD0iIzliYTFhYiIvPjwvc3ZnPg=="
 
 export default function NewsTemplateSelector() {
+  const router = useRouter()
   const [selectedTemplate, setSelectedTemplate] = useState("city-night")
   const [newsData, setNewsData] = useState<NewsItem[]>([])
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -152,6 +154,13 @@ export default function NewsTemplateSelector() {
 
   // 다운로드 핸들러
   const handleDownload = () => {
+    if (!isLoggedIn) {
+      if (confirm("이미지 다운로드는 로그인이 필요합니다.\n로그인 페이지로 이동하시겠습니까?")) {
+        router.push("/auth/login")
+      }
+      return
+    }
+
     if (!canvasRef.current) return
 
     const link = document.createElement("a")

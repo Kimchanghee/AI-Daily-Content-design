@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef, useCallback } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Download, RefreshCw } from "lucide-react"
 import type { ZodiacFortune } from "@/components/templates/fortune-types"
@@ -14,7 +15,9 @@ interface FortunePreviewProps {
 }
 
 export default function FortunePreview({ isMobile = false }: FortunePreviewProps) {
+  const router = useRouter()
   const [fortuneData, setFortuneData] = useState<ZodiacFortune[]>([])
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [userName, setUserName] = useState("홍길동")
   const [userPhone, setUserPhone] = useState("010-0000-0000")
   const [userBrandPhrase, setUserBrandPhrase] = useState("")
@@ -57,6 +60,8 @@ export default function FortunePreview({ isMobile = false }: FortunePreviewProps
           data: { user },
         } = await supabase.auth.getUser()
 
+        setIsLoggedIn(!!user)
+
         if (user) {
           setUserName(user.user_metadata?.name || user.user_metadata?.full_name || "홍길동")
           setUserPhone(user.user_metadata?.phone || "010-0000-0000")
@@ -73,6 +78,7 @@ export default function FortunePreview({ isMobile = false }: FortunePreviewProps
           img.src = DEFAULT_AVATAR
         }
       } catch {
+        setIsLoggedIn(false)
         const img = new Image()
         img.onload = () => setProfileImageLoaded(img)
         img.src = DEFAULT_AVATAR
@@ -115,6 +121,13 @@ export default function FortunePreview({ isMobile = false }: FortunePreviewProps
 
   // 다운로드 핸들러
   const handleDownload = () => {
+    if (!isLoggedIn) {
+      if (confirm("이미지 다운로드는 로그인이 필요합니다.\n로그인 페이지로 이동하시겠습니까?")) {
+        router.push("/auth/login")
+      }
+      return
+    }
+
     if (!canvasRef.current) return
 
     const link = document.createElement("a")
