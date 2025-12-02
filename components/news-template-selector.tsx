@@ -11,6 +11,7 @@ import {
   TemplatePreview,
   Footer,
 } from "@/components/news"
+import { FortunePreview } from "@/components/fortune"
 
 const DEFAULT_AVATAR =
   "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+PGNpcmNsZSBjeD0iNjAiIGN5PSI2MCIgcj0iNjAiIGZpbGw9IiNlNWU3ZWIiLz48Y2lyY2xlIGN4PSI2MCIgY3k9IjQ1IiByPSIyMCIgZmlsbD0iIzliYTFhYiIvPjxwYXRoIGQ9Ik0yNSAxMTBjMC0yNSAxNS00MCAzNS00MHMzNSAxNSAzNSA0MCIgZmlsbD0iIzliYTFhYiIvPjwvc3ZnPg=="
@@ -26,6 +27,7 @@ export default function NewsTemplateSelector() {
   const miniCanvasRefs = useRef<Map<string, HTMLCanvasElement>>(new Map())
   const [profileImageLoaded, setProfileImageLoaded] = useState<HTMLImageElement | null>(null)
   const [isMobile, setIsMobile] = useState(false)
+  const [activeTab, setActiveTab] = useState<"news" | "fortune">("news")
 
   const CANVAS_WIDTH = 540
   const CANVAS_HEIGHT = 960
@@ -168,22 +170,56 @@ export default function NewsTemplateSelector() {
       <HeroBanner />
       <TopicBadges />
 
-      {/* 템플릿 선택 및 미리보기 */}
+      {/* 탭 선택 */}
+      <section className="py-4 px-4 bg-gray-50 border-b border-gray-200">
+        <div className="max-w-[1400px] mx-auto">
+          <div className="flex justify-center gap-2">
+            <button
+              onClick={() => setActiveTab("news")}
+              className={`px-6 py-3 rounded-full font-semibold text-sm transition-all ${
+                activeTab === "news"
+                  ? "bg-black text-white shadow-lg"
+                  : "bg-white text-gray-600 border border-gray-300 hover:bg-gray-100"
+              }`}
+            >
+              오늘의 뉴스
+            </button>
+            <button
+              onClick={() => setActiveTab("fortune")}
+              className={`px-6 py-3 rounded-full font-semibold text-sm transition-all ${
+                activeTab === "fortune"
+                  ? "bg-orange-600 text-white shadow-lg"
+                  : "bg-white text-gray-600 border border-gray-300 hover:bg-gray-100"
+              }`}
+            >
+              띠별운세
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* 콘텐츠 영역 */}
       <section className="py-8 px-4 bg-white">
         <div className="max-w-[1400px] mx-auto">
-          <div className="flex flex-col lg:flex-row gap-6">
-            <TemplateSelector
-              selectedTemplate={selectedTemplate}
-              onSelectTemplate={setSelectedTemplate}
-              miniCanvasRefs={miniCanvasRefs}
-              isMobile={isMobile}
-            />
-            <TemplatePreview
-              canvasRef={canvasRef}
-              onDownload={handleDownload}
-              isMobile={isMobile}
-            />
-          </div>
+          {activeTab === "news" ? (
+            <div className="flex flex-col lg:flex-row gap-6">
+              <TemplateSelector
+                selectedTemplate={selectedTemplate}
+                onSelectTemplate={setSelectedTemplate}
+                miniCanvasRefs={miniCanvasRefs}
+                isMobile={isMobile}
+              />
+              <TemplatePreview
+                canvasRef={canvasRef}
+                onDownload={handleDownload}
+                isMobile={isMobile}
+              />
+            </div>
+          ) : (
+            <div className="flex justify-center">
+              <FortunePreview isMobile={isMobile} />
+            </div>
+          )}
         </div>
       </section>
 
