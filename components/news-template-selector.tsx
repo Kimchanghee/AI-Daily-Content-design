@@ -233,11 +233,11 @@ export default function NewsTemplateSelector() {
           </p>
           <div className="flex justify-center items-center gap-1 md:gap-2 flex-wrap">
             {[
-              { day: "월", topic: "정치", color: "bg-red-500" },
-              { day: "화", topic: "경제", color: "bg-blue-500" },
-              { day: "수", topic: "사회", color: "bg-green-500" },
+              { day: "월", topic: "IT/과학", color: "bg-blue-500" },
+              { day: "화", topic: "경제", color: "bg-green-500" },
+              { day: "수", topic: "사회", color: "bg-yellow-500" },
               { day: "목", topic: "생활/문화", color: "bg-purple-500" },
-              { day: "금", topic: "IT/과학", color: "bg-orange-500" },
+              { day: "금", topic: "연예/스포츠", color: "bg-pink-500" },
             ].map((item) => (
               <div
                 key={item.day}

@@ -12,9 +12,9 @@ const getMockNewsData = (topic: string) => {
   const dateStr = `${koreaTime.getFullYear()}.${String(koreaTime.getMonth() + 1).padStart(2, "0")}.${String(koreaTime.getDate()).padStart(2, "0")}`
 
   const mockByTopic: Record<string, any[]> = {
-    "정치": [
-      { id: "1", category: "정치", title: "여야 예산안 협상 난항", summary: "복지예산 증액을 두고 여야 이견이 좁혀지지 않으며 법정처리 시한이 임박했다. 여당은 재정건전성을, 야당은 취약계층 지원 확대를 주장하며 막판 줄다리기가 이어지고 있다.", source: "KBS", publishedAt: dateStr, reporter: "김정은" },
-      { id: "2", category: "정치", title: "대통령실, 새 정책 발표 예고", summary: "대통령실이 다음 주 중요 정책 발표를 예고했다. 경제 활성화와 민생 안정을 위한 종합대책이 포함될 것으로 전망되며, 각 부처별 세부 계획도 함께 공개될 예정이다.", source: "연합뉴스", publishedAt: dateStr, reporter: "박기자" },
+    "연예/스포츠": [
+      { id: "1", category: "연예/스포츠", title: "손흥민, 시즌 10호골 폭발", summary: "토트넘 손흥민이 프리미어리그에서 시즌 10호골을 터뜨리며 팀 승리를 이끌었다. 경기 후 인터뷰에서 '팀 동료들 덕분'이라며 겸손한 소감을 밝혔다.", source: "스포츠조선", publishedAt: dateStr, reporter: "박스포츠" },
+      { id: "2", category: "연예/스포츠", title: "아이유, 신곡 음원차트 올킬", summary: "아이유의 새 앨범 타이틀곡이 발매 직후 주요 음원 사이트 1위를 석권했다. 감성적인 가사와 멜로디로 팬들의 뜨거운 반응을 얻고 있다.", source: "엔터뉴스", publishedAt: dateStr, reporter: "김연예" },
     ],
     "경제": [
       { id: "1", category: "경제", title: "몸값 오른 코스피, 당분간은 쉼", summary: "외국인 투자자들이 중소형주로 관심을 돌리며 코스피 상승세가 주춤하고 있다. 전문가들은 단기 조정 국면에 진입했으며, 미국 금리 동결 기대감이 반영되면 다시 상승 흐름을 탈 것으로 전망하고 있다.", source: "한국경제", publishedAt: dateStr, reporter: "김민수" },

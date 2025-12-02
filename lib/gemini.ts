@@ -51,9 +51,9 @@ export async function fetchNewsWithGemini(): Promise<NewsItem[]> {
 
     const html = await htmlResponse.text()
 
-    // Gemini API로 뉴스 추출 요청
+    // Gemini API로 뉴스 추출 요청 (gemini-2.0-flash 사용)
     const geminiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
       {
         method: "POST",
         headers: {

@@ -70,11 +70,11 @@ export const TEMPLATES: TemplateConfig[] = [
 
 // 요일별 토픽 설정
 export const DAY_TOPICS: Record<number, { topic: string; url: string }> = {
-  1: { topic: "정치", url: "https://news.naver.com/section/100" },
+  1: { topic: "IT/과학", url: "https://news.naver.com/section/105" },
   2: { topic: "경제", url: "https://news.naver.com/section/101" },
   3: { topic: "사회", url: "https://news.naver.com/section/102" },
   4: { topic: "생활/문화", url: "https://news.naver.com/section/103" },
-  5: { topic: "IT/과학", url: "https://news.naver.com/section/105" },
+  5: { topic: "연예/스포츠", url: "https://entertain.naver.com/home" },
   0: { topic: "세계", url: "https://news.naver.com/section/104" },
   6: { topic: "세계", url: "https://news.naver.com/section/104" },
 }
