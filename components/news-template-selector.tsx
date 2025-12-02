@@ -21,6 +21,7 @@ export default function NewsTemplateSelector() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [userName, setUserName] = useState("홍길동")
   const [userPhone, setUserPhone] = useState("010-0000-0000")
+  const [userBrandPhrase, setUserBrandPhrase] = useState("")
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const miniCanvasRefs = useRef<Map<string, HTMLCanvasElement>>(new Map())
   const [profileImageLoaded, setProfileImageLoaded] = useState<HTMLImageElement | null>(null)
@@ -66,6 +67,7 @@ export default function NewsTemplateSelector() {
         if (user) {
           setUserName(user.user_metadata?.name || user.user_metadata?.full_name || "홍길동")
           setUserPhone(user.user_metadata?.phone || "010-0000-0000")
+          setUserBrandPhrase(user.user_metadata?.brand_phrase || "")
           const profileImg = user.user_metadata?.profile_image || DEFAULT_AVATAR
           const img = new Image()
           img.crossOrigin = "anonymous"
@@ -115,9 +117,10 @@ export default function NewsTemplateSelector() {
     renderTemplate(selectedTemplate, ctx, CANVAS_WIDTH, CANVAS_HEIGHT, newsData, {
       name: userName,
       phone: userPhone,
+      brandPhrase: userBrandPhrase,
       profileImage: profileImageLoaded,
     })
-  }, [selectedTemplate, newsData, userName, userPhone, profileImageLoaded, isMobile])
+  }, [selectedTemplate, newsData, userName, userPhone, userBrandPhrase, profileImageLoaded, isMobile])
 
   // 미니 프리뷰 렌더링
   useEffect(() => {
@@ -141,10 +144,11 @@ export default function NewsTemplateSelector() {
       renderMiniPreview(template.id, ctx, miniWidth, miniHeight, newsData, {
         name: userName,
         phone: userPhone,
+        brandPhrase: userBrandPhrase,
         profileImage: profileImageLoaded,
       })
     })
-  }, [newsData, userName, userPhone, profileImageLoaded])
+  }, [newsData, userName, userPhone, userBrandPhrase, profileImageLoaded])
 
   // 다운로드 핸들러
   const handleDownload = () => {

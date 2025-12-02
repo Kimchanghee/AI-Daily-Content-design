@@ -17,6 +17,7 @@ export default function SignupPage() {
   const router = useRouter()
   const [name, setName] = useState("")
   const [phone, setPhone] = useState("")
+  const [brandPhrase, setBrandPhrase] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -70,6 +71,7 @@ export default function SignupPage() {
             full_name: name,
             display_name: name,
             phone: phone,
+            brand_phrase: brandPhrase,
             profile_image: profileImage,
             service_name: "DM 데일리 메시지",
           },
@@ -158,6 +160,18 @@ export default function SignupPage() {
                   onChange={(e) => setPhone(e.target.value)}
                   required
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="brandPhrase">브랜드 문장</Label>
+                <Input
+                  id="brandPhrase"
+                  type="text"
+                  placeholder="예: 보장분석전문가, 벤츠세일즈전문가"
+                  value={brandPhrase}
+                  onChange={(e) => setBrandPhrase(e.target.value)}
+                />
+                <p className="text-xs text-gray-500">뉴스 템플릿에 표시될 나만의 전문 분야를 입력하세요</p>
               </div>
 
               <div className="space-y-2">

@@ -12,6 +12,7 @@ export interface NewsItem {
 export interface UserInfo {
   name: string
   phone: string
+  brandPhrase?: string
   profileImage: HTMLImageElement | null
 }
 

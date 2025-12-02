@@ -126,6 +126,13 @@ export const renderCityNight = (
   ctx.font = "13px sans-serif"
   ctx.fillText("📞 " + user.phone, 100, 62)
 
+  // 브랜드 문장
+  if (user.brandPhrase) {
+    ctx.fillStyle = "#a0aec0"
+    ctx.font = "11px sans-serif"
+    ctx.fillText(user.brandPhrase, 100, 78)
+  }
+
   // 뉴스 카드
   const cardX = 20,
     cardY = 105,
@@ -138,7 +145,7 @@ export const renderCityNight = (
 
   ctx.fillStyle = "#1a202c"
   ctx.font = "bold 22px 'Georgia', serif"
-  ctx.fillText("Today's News", cardX + 25, cardY + 38)
+  ctx.fillText("오늘의 헤드라인", cardX + 25, cardY + 38)
   ctx.textAlign = "right"
   ctx.font = "12px sans-serif"
   ctx.fillStyle = "#718096"
@@ -241,11 +248,18 @@ export const renderLuxuryGold = (
   ctx.fillStyle = "#888"
   ctx.font = "12px sans-serif"
   ctx.fillText(user.phone, width / 2, pY + 72)
+
+  // 브랜드 문장
+  if (user.brandPhrase) {
+    ctx.fillStyle = "#d4af37"
+    ctx.font = "10px sans-serif"
+    ctx.fillText(user.brandPhrase, width / 2, pY + 88)
+  }
   ctx.textAlign = "left"
 
   // 뉴스 카드
   const cardX = 40,
-    cardY = 165,
+    cardY = user.brandPhrase ? 175 : 165,
     cardW = width - 80,
     cardH = height - 280
   ctx.fillStyle = "rgba(255,255,255,0.97)"
@@ -259,7 +273,7 @@ export const renderLuxuryGold = (
   ctx.textAlign = "center"
   ctx.fillStyle = "#1a1a2e"
   ctx.font = "bold 18px 'Georgia', serif"
-  ctx.fillText("✦ Today's News ✦", width / 2, cardY + 32)
+  ctx.fillText("✦ 오늘의 헤드라인 ✦", width / 2, cardY + 32)
   ctx.font = "11px sans-serif"
   ctx.fillStyle = "#888"
   ctx.fillText(getDateString(), width / 2, cardY + 50)
@@ -330,6 +344,13 @@ export const renderOceanBlue = (
   ctx.fillStyle = "#1e6091"
   ctx.fillText(user.phone, 100, 68)
 
+  // 브랜드 문장
+  if (user.brandPhrase) {
+    ctx.fillStyle = "#4a90a4"
+    ctx.font = "10px sans-serif"
+    ctx.fillText(user.brandPhrase, 100, 82)
+  }
+
   // 날짜
   ctx.textAlign = "right"
   ctx.font = "11px sans-serif"
@@ -345,7 +366,7 @@ export const renderOceanBlue = (
 
   ctx.fillStyle = "#0a3d62"
   ctx.font = "bold 18px sans-serif"
-  ctx.fillText("📰 Today's News", 35, 145)
+  ctx.fillText("📰 오늘의 헤드라인", 35, 145)
 
   let y = 170
   const maxNewsY = height - 90
@@ -412,6 +433,13 @@ export const renderForestGreen = (
   ctx.fillStyle = "#56ab91"
   ctx.fillText(user.phone, 85, 52)
 
+  // 브랜드 문장
+  if (user.brandPhrase) {
+    ctx.fillStyle = "#1b4332"
+    ctx.font = "10px sans-serif"
+    ctx.fillText(user.brandPhrase, 85, 66)
+  }
+
   ctx.textAlign = "right"
   ctx.font = "11px sans-serif"
   ctx.fillStyle = "#1b4332"
@@ -430,7 +458,7 @@ export const renderForestGreen = (
 
   ctx.fillStyle = "#1b4332"
   ctx.font = "bold 18px sans-serif"
-  ctx.fillText("Today's News", 58, 135)
+  ctx.fillText("오늘의 헤드라인", 58, 135)
 
   let y = 160
   const maxNewsY = height - 80
@@ -494,6 +522,13 @@ export const renderSunsetWarm = (
   ctx.fillStyle = "#ff7043"
   ctx.fillText(user.phone, 95, 65)
 
+  // 브랜드 문장
+  if (user.brandPhrase) {
+    ctx.fillStyle = "#bf360c"
+    ctx.font = "10px sans-serif"
+    ctx.fillText(user.brandPhrase, 95, 80)
+  }
+
   // 뉴스 카드
   ctx.fillStyle = "rgba(255,255,255,0.97)"
   ctx.beginPath()
@@ -502,7 +537,7 @@ export const renderSunsetWarm = (
 
   ctx.fillStyle = "#bf360c"
   ctx.font = "bold 18px sans-serif"
-  ctx.fillText("🌅 Today's News", 38, 138)
+  ctx.fillText("🌅 오늘의 헤드라인", 38, 138)
   ctx.textAlign = "right"
   ctx.font = "11px sans-serif"
   ctx.fillStyle = "#888"
@@ -563,6 +598,13 @@ export const renderMinimalMono = (
   ctx.fillStyle = "#aaa"
   ctx.fillText(user.phone, 95, 60)
 
+  // 브랜드 문장
+  if (user.brandPhrase) {
+    ctx.fillStyle = "#888"
+    ctx.font = "10px sans-serif"
+    ctx.fillText(user.brandPhrase, 95, 76)
+  }
+
   ctx.textAlign = "right"
   ctx.fillStyle = "#fff"
   ctx.font = "11px sans-serif"
@@ -575,7 +617,7 @@ export const renderMinimalMono = (
 
   ctx.fillStyle = "#000"
   ctx.font = "bold 18px sans-serif"
-  ctx.fillText("TODAY'S NEWS", 28, 125)
+  ctx.fillText("오늘의 헤드라인", 28, 125)
 
   // 구분선
   ctx.strokeStyle = "#000"
