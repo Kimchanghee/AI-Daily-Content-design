@@ -17,7 +17,7 @@ const DEFAULT_AVATAR =
 
 export default function NewsTemplateSelector() {
   const router = useRouter()
-  const [selectedTemplate, setSelectedTemplate] = useState("city-night")
+  const [selectedTemplate, setSelectedTemplate] = useState("soft-blue")
   const [newsData, setNewsData] = useState<NewsItem[]>([])
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [userName, setUserName] = useState("홍길동")

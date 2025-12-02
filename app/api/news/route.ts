@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { fetchNewsWithGemini, getTodayTopic } from "@/lib/gemini"
+import { saveNewsData, loadNewsData, getDateKey, cleanupOldNews } from "@/lib/news-storage"
 
-let cachedNewsData: any[] = []
 let lastUpdateTime: Date | null = null
 let lastUpdateDay: number | null = null
 
@@ -38,7 +38,6 @@ const getMockNewsData = (topic: string) => {
     ],
   }
 
-  // 해당 토픽의 Mock 데이터 반환 (없으면 경제 기본값)
   const topicNews = mockByTopic[topic] || mockByTopic["경제"]
 
   // 15개로 확장
@@ -55,13 +54,17 @@ const getMockNewsData = (topic: string) => {
 }
 
 // 오후 9시(21시)에 업데이트해야 하는지 확인
-const shouldUpdateNews = (now: Date): boolean => {
+const shouldUpdateNews = async (now: Date): Promise<boolean> => {
   const koreaTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Seoul" }))
   const currentHour = koreaTime.getHours()
   const currentDay = koreaTime.getDay()
+  const todayKey = getDateKey()
 
-  // 캐시가 없으면 업데이트
-  if (cachedNewsData.length === 0) {
+  // 오늘 날짜의 저장된 데이터가 있는지 확인
+  const savedData = await loadNewsData(todayKey)
+
+  // 저장된 데이터가 없으면 업데이트
+  if (!savedData) {
     return true
   }
 
@@ -98,15 +101,22 @@ const shouldUpdateNews = (now: Date): boolean => {
 export async function POST() {
   const now = new Date()
   const { topic, dayOfWeek } = getTodayTopic()
+  const todayKey = getDateKey()
 
-  // 캐시가 비어있거나 업데이트가 필요한 경우
-  if (shouldUpdateNews(now)) {
+  // 오래된 파일 정리 (30일 이상)
+  await cleanupOldNews(30)
+
+  // 업데이트가 필요한지 확인
+  if (await shouldUpdateNews(now)) {
     console.log(`[News API] Updating news for topic: ${topic} (day: ${dayOfWeek})`)
 
     try {
       // Gemini API로 실제 뉴스 가져오기 시도
       const newsData = await fetchNewsWithGemini()
-      cachedNewsData = newsData
+
+      // JSON 파일로 저장
+      await saveNewsData(newsData, topic)
+
       lastUpdateTime = now
       lastUpdateDay = dayOfWeek
 
@@ -114,6 +124,7 @@ export async function POST() {
         success: true,
         data: newsData,
         topic: topic,
+        date: todayKey,
         timestamp: now.toISOString(),
         source: "gemini",
         nextUpdate: "매일 오후 9시 (KST)",
@@ -124,7 +135,10 @@ export async function POST() {
 
       // Gemini 실패 시 Mock 데이터 사용
       const mockData = getMockNewsData(topic)
-      cachedNewsData = mockData
+
+      // Mock 데이터도 저장
+      await saveNewsData(mockData, topic)
+
       lastUpdateTime = now
       lastUpdateDay = dayOfWeek
 
@@ -132,6 +146,7 @@ export async function POST() {
         success: true,
         data: mockData,
         topic: topic,
+        date: todayKey,
         timestamp: now.toISOString(),
         source: "mock",
         nextUpdate: "매일 오후 9시 (KST)",
@@ -140,34 +155,78 @@ export async function POST() {
     }
   }
 
-  // 캐시된 데이터 반환
+  // 저장된 데이터 불러오기
+  const savedData = await loadNewsData(todayKey)
+
+  if (savedData && savedData.news) {
+    return NextResponse.json({
+      success: true,
+      data: savedData.news,
+      topic: savedData.topic || topic,
+      date: todayKey,
+      timestamp: savedData.updatedAt || now.toISOString(),
+      source: "file",
+      usedCache: true,
+      nextUpdate: "매일 오후 9시 (KST)",
+      message: `저장된 ${topic} 뉴스입니다. 다음 업데이트: 오후 9시`,
+    })
+  }
+
+  // 저장된 데이터가 없으면 새로 가져오기
+  const mockData = getMockNewsData(topic)
+  await saveNewsData(mockData, topic)
+
   return NextResponse.json({
     success: true,
-    data: cachedNewsData,
+    data: mockData,
     topic: topic,
-    timestamp: lastUpdateTime?.toISOString() || now.toISOString(),
-    source: "cache",
-    usedCache: true,
-    nextUpdate: "매일 오후 9시 (KST)",
-    message: `캐시된 ${topic} 뉴스입니다. 다음 업데이트: 오후 9시`,
+    date: todayKey,
+    timestamp: now.toISOString(),
+    source: "mock",
+    message: `${topic} 뉴스 (초기 데이터)`,
   })
 }
 
-// GET 요청도 지원 (수동 새로고침용)
+// GET 요청도 지원 (특정 날짜/인덱스 조회용)
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const forceRefresh = searchParams.get("refresh") === "true"
+  const dateParam = searchParams.get("date") // YYYY-MM-DD 형식
+  const indexParam = searchParams.get("index") // 특정 뉴스 인덱스
 
   const now = new Date()
   const { topic, dayOfWeek } = getTodayTopic()
+  const targetDate = dateParam || getDateKey()
 
-  // 강제 새로고침이거나 캐시가 없는 경우
-  if (forceRefresh || cachedNewsData.length === 0) {
+  // 특정 인덱스의 뉴스 아이템 요청
+  if (indexParam !== null) {
+    const index = parseInt(indexParam, 10)
+    const savedData = await loadNewsData(targetDate)
+
+    if (savedData && savedData.news && index >= 0 && index < savedData.news.length) {
+      return NextResponse.json({
+        success: true,
+        data: savedData.news[index],
+        index: index,
+        totalCount: savedData.news.length,
+        date: targetDate,
+        topic: savedData.topic,
+      })
+    }
+
+    return NextResponse.json({
+      success: false,
+      error: `Index ${index} not found for date ${targetDate}`,
+    }, { status: 404 })
+  }
+
+  // 강제 새로고침
+  if (forceRefresh) {
     console.log(`[News API] Force refresh for topic: ${topic}`)
 
     try {
       const newsData = await fetchNewsWithGemini()
-      cachedNewsData = newsData
+      await saveNewsData(newsData, topic)
       lastUpdateTime = now
       lastUpdateDay = dayOfWeek
 
@@ -175,6 +234,7 @@ export async function GET(request: Request) {
         success: true,
         data: newsData,
         topic: topic,
+        date: getDateKey(),
         timestamp: now.toISOString(),
         source: "gemini",
         message: `${topic} 뉴스 새로고침 완료`,
@@ -183,29 +243,57 @@ export async function GET(request: Request) {
       console.error("[News API] Gemini fetch failed:", error)
 
       const mockData = getMockNewsData(topic)
-      if (cachedNewsData.length === 0) {
-        cachedNewsData = mockData
-        lastUpdateTime = now
-        lastUpdateDay = dayOfWeek
-      }
+      await saveNewsData(mockData, topic)
 
       return NextResponse.json({
         success: true,
-        data: cachedNewsData.length > 0 ? cachedNewsData : mockData,
+        data: mockData,
         topic: topic,
-        timestamp: lastUpdateTime?.toISOString() || now.toISOString(),
-        source: cachedNewsData.length > 0 ? "cache" : "mock",
-        message: `${topic} 뉴스 (Gemini API 오류로 캐시/샘플 사용)`,
+        date: getDateKey(),
+        timestamp: now.toISOString(),
+        source: "mock",
+        message: `${topic} 뉴스 (Gemini API 오류로 샘플 사용)`,
       })
     }
   }
 
+  // 저장된 데이터 불러오기
+  const savedData = await loadNewsData(targetDate)
+
+  if (savedData && savedData.news) {
+    return NextResponse.json({
+      success: true,
+      data: savedData.news,
+      topic: savedData.topic,
+      date: targetDate,
+      timestamp: savedData.updatedAt,
+      source: "file",
+      totalCount: savedData.news.length,
+      message: `${savedData.topic} 뉴스 (${targetDate})`,
+    })
+  }
+
+  // 오늘 날짜가 아닌 경우 데이터 없음 반환
+  if (targetDate !== getDateKey()) {
+    return NextResponse.json({
+      success: false,
+      error: `No news data found for date ${targetDate}`,
+      date: targetDate,
+    }, { status: 404 })
+  }
+
+  // 오늘 날짜인데 데이터가 없으면 새로 생성
+  const mockData = getMockNewsData(topic)
+  await saveNewsData(mockData, topic)
+
   return NextResponse.json({
     success: true,
-    data: cachedNewsData,
+    data: mockData,
     topic: topic,
-    timestamp: lastUpdateTime?.toISOString() || now.toISOString(),
-    source: "cache",
-    message: `캐시된 ${topic} 뉴스`,
+    date: getDateKey(),
+    timestamp: now.toISOString(),
+    source: "mock",
+    totalCount: mockData.length,
+    message: `${topic} 뉴스 (초기 데이터)`,
   })
 }
