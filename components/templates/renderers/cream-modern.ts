@@ -1,5 +1,5 @@
-import type { NewsItem, UserInfo } from "../template-types"
-import { getDateString, drawProfile, drawNewsItem } from "./common"
+import type { NewsItem, UserInfo } from "../template-types.js"
+import { getDateString, drawProfile, drawNewsItem } from "./common.js"
 
 // 템플릿 4: 크림 모던 - 따뜻한 크림 톤 모던 스타일
 export const renderCreamModern = (

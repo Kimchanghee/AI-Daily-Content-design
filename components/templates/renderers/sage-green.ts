@@ -1,5 +1,5 @@
-import type { NewsItem, UserInfo } from "../template-types"
-import { getDateString, drawProfile, drawNewsItem } from "./common"
+import type { NewsItem, UserInfo } from "../template-types.js"
+import { getDateString, drawProfile, drawNewsItem } from "./common.js"
 
 // 템플릿 5: 세이지 그린 - 평온한 세이지 그린 스타일
 export const renderSageGreen = (

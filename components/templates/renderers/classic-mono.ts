@@ -1,5 +1,5 @@
-import type { NewsItem, UserInfo } from "../template-types"
-import { getDateString, drawProfile, drawNewsItem } from "./common"
+import type { NewsItem, UserInfo } from "../template-types.js"
+import { getDateString, drawProfile, drawNewsItem } from "./common.js"
 
 // 템플릿 8: 클래식 모노 - 클래식 화이트 그레이 스타일
 export const renderClassicMono = (

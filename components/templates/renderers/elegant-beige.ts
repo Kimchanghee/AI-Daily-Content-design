@@ -1,5 +1,5 @@
-import type { NewsItem, UserInfo } from "../template-types"
-import { getDateString, drawProfile, drawNewsItem } from "./common"
+import type { NewsItem, UserInfo } from "../template-types.js"
+import { getDateString, drawProfile, drawNewsItem } from "./common.js"
 
 // 템플릿 6: 엘레강스 베이지 - 우아한 베이지 톤 스타일
 export const renderElegantBeige = (

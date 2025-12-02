@@ -1,4 +1,4 @@
-import type { NewsItem, UserInfo } from "./template-types"
+import type { NewsItem, UserInfo } from "./template-types.js"
 import {
   renderSoftBlue,
   renderElegantSchool,
@@ -10,7 +10,7 @@ import {
   renderClassicMono,
   renderWarmPeach,
   renderMintGreen,
-} from "./renderers"
+} from "./renderers/index.js"
 
 // 템플릿 렌더링 함수 매핑
 const templateRenderers: Record<

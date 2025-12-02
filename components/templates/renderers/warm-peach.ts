@@ -1,5 +1,5 @@
-import type { NewsItem, UserInfo } from "../template-types"
-import { getDateString, drawProfile, drawNewsItem } from "./common"
+import type { NewsItem, UserInfo } from "../template-types.js"
+import { getDateString, drawProfile, drawNewsItem } from "./common.js"
 
 // 템플릿 9: 웜 피치 - 따뜻한 피치 톤 스타일
 export const renderWarmPeach = (
