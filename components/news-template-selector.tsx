@@ -3,15 +3,13 @@
 import { useState, useEffect, useCallback, useRef } from "react"
 import { TEMPLATES, type NewsItem } from "@/components/templates/template-types"
 import { renderTemplate, renderMiniPreview } from "@/components/templates/template-renderer"
-import {
-  Header,
-  HeroBanner,
-  TopicBadges,
-  TemplateSelector,
-  TemplatePreview,
-  Footer,
-} from "@/components/news"
-import { FortunePreview } from "@/components/fortune"
+import Header from "@/components/news/Header"
+import HeroBanner from "@/components/news/HeroBanner"
+import TopicBadges from "@/components/news/TopicBadges"
+import TemplateSelector from "@/components/news/TemplateSelector"
+import TemplatePreview from "@/components/news/TemplatePreview"
+import Footer from "@/components/news/Footer"
+import FortunePreview from "@/components/fortune/FortunePreview"
 
 const DEFAULT_AVATAR =
   "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+PGNpcmNsZSBjeD0iNjAiIGN5PSI2MCIgcj0iNjAiIGZpbGw9IiNlNWU3ZWIiLz48Y2lyY2xlIGN4PSI2MCIgY3k9IjQ1IiByPSIyMCIgZmlsbD0iIzliYTFhYiIvPjxwYXRoIGQ9Ik0yNSAxMTBjMC0yNSAxNS00MCAzNS00MHMzNSAxNSAzNSA0MCIgZmlsbD0iIzliYTFhYiIvPjwvc3ZnPg=="
