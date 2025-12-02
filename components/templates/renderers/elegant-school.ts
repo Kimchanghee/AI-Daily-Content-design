@@ -1,5 +1,5 @@
-import type { NewsItem, UserInfo } from "../template-types.js"
-import { getDateString, drawProfile, drawNewsItem } from "./common.js"
+import type { NewsItem, UserInfo } from "../template-types"
+import { getDateString, drawProfile, drawNewsItem } from "./common"
 
 // 템플릿 2: 엘레강스 스쿨 - 우아한 학교 뉴스 스타일
 export const renderElegantSchool = (

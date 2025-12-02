@@ -1,5 +1,5 @@
-import type { NewsItem, UserInfo } from "../template-types.js"
-import { getDateString, drawProfile, drawNewsItem } from "./common.js"
+import type { NewsItem, UserInfo } from "../template-types"
+import { getDateString, drawProfile, drawNewsItem } from "./common"
 
 // 템플릿 3: 파스텔 빈티지 - 부드러운 파스텔 핑크 스타일
 export const renderPastelVintage = (

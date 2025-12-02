@@ -1,5 +1,5 @@
-import type { NewsItem, UserInfo } from "../template-types.js"
-import { getDateString, drawProfile, drawNewsItem, drawStockInfo } from "./common.js"
+import type { NewsItem, UserInfo } from "../template-types"
+import { getDateString, drawProfile, drawNewsItem, drawStockInfo } from "./common"
 
 // 템플릿 1: 소프트 블루 - 부드러운 블루 뉴스레터 스타일
 export const renderSoftBlue = (

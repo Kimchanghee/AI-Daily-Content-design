@@ -1,5 +1,5 @@
-import type { NewsItem, UserInfo } from "../template-types.js"
-import { getDateString, drawProfile, drawNewsItem } from "./common.js"
+import type { NewsItem, UserInfo } from "../template-types"
+import { getDateString, drawProfile, drawNewsItem } from "./common"
 
 // 템플릿 7: 소프트 라벤더 - 부드러운 라벤더 스타일
 export const renderSoftLavender = (
