@@ -1,1 +1,1 @@
-export { default as FortunePreview } from "./FortunePreview"
+export { default as FortunePreview } from "./FortunePreview.tsx"
