@@ -14,7 +14,8 @@
       "Bash(git ls-tree:*)",
       "Bash(cat:*)",
       "Bash(if not exist \"data\\news\" mkdir \"data\\news\")",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "Bash(dir:*)"
     ],
     "deny": [],
     "ask": []
