@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { fetchNewsWithGemini, getTodayTopic } from "@/lib/gemini"
 import { saveNewsData, loadNewsData, getDateKey, cleanupOldNews } from "@/lib/news-storage"
+import { sendNewsToExternalServer } from "@/lib/external-api"
 
 let lastUpdateTime: Date | null = null
 let lastUpdateDay: number | null = null
@@ -117,6 +118,13 @@ export async function POST() {
       // JSON 파일로 저장
       await saveNewsData(newsData, topic)
 
+      // 외부 서버로 전송
+      try {
+        await sendNewsToExternalServer(newsData)
+      } catch (externalError) {
+        console.error("[News API] External server send failed:", externalError)
+      }
+
       lastUpdateTime = now
       lastUpdateDay = dayOfWeek
 
@@ -138,6 +146,13 @@ export async function POST() {
 
       // Mock 데이터도 저장
       await saveNewsData(mockData, topic)
+
+      // 외부 서버로 전송
+      try {
+        await sendNewsToExternalServer(mockData)
+      } catch (externalError) {
+        console.error("[News API] External server send failed:", externalError)
+      }
 
       lastUpdateTime = now
       lastUpdateDay = dayOfWeek

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { generateFortuneWithGemini, getDefaultFortunes } from "@/lib/gemini-fortune"
 import type { ZodiacFortune } from "@/components/templates/fortune-types"
+import { sendFortuneToExternalServer } from "@/lib/external-api"
 
 let cachedFortuneData: ZodiacFortune[] = []
 let lastUpdateTime: Date | null = null
@@ -69,6 +70,13 @@ export async function POST() {
       lastUpdateTime = now
       lastUpdateDay = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Seoul" })).getDate()
 
+      // 외부 서버로 전송
+      try {
+        await sendFortuneToExternalServer(fortuneData)
+      } catch (externalError) {
+        console.error("[Fortune API] External server send failed:", externalError)
+      }
+
       return NextResponse.json({
         success: true,
         data: {
@@ -88,6 +96,13 @@ export async function POST() {
       cachedFortuneData = defaultData
       lastUpdateTime = now
       lastUpdateDay = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Seoul" })).getDate()
+
+      // 외부 서버로 전송
+      try {
+        await sendFortuneToExternalServer(defaultData)
+      } catch (externalError) {
+        console.error("[Fortune API] External server send failed:", externalError)
+      }
 
       return NextResponse.json({
         success: true,
