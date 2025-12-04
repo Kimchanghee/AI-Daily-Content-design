@@ -68,3 +68,31 @@ export async function sendFortuneToExternalServer(fortuneData: any[]): Promise<E
     throw error
   }
 }
+
+// 증시/환율 데이터를 외부 서버로 전송
+export async function sendStockToExternalServer(stockData: any): Promise<ExternalApiResponse> {
+  try {
+    console.log(`[External API] Sending stock data to external server`)
+
+    const response = await fetch(`${EXTERNAL_API_BASE}/stock`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+      },
+      body: JSON.stringify({
+        content: JSON.stringify(stockData),
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error(`External API error: ${response.status}`)
+    }
+
+    const result = await response.json()
+    console.log("[External API] Stock sent successfully:", result)
+    return result
+  } catch (error) {
+    console.error("[External API] Failed to send stock:", error)
+    throw error
+  }
+}
