@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/update-news",
       "schedule": "0 12 * * *"
+    },
+    {
+      "path": "/api/cron/update-fortune",
+      "schedule": "0 12 * * *"
     }
   ]
 }
