@@ -64,7 +64,7 @@ export async function fetchNewsWithGemini(): Promise<NewsItem[]> {
             {
               parts: [
                 {
-                  text: `다음은 네이버 뉴스 "${topic}" 섹션의 HTML입니다. 이 페이지에서 주요 뉴스 기사 15개를 추출해주세요.
+                  text: `다음은 네이버 뉴스 "${topic}" 섹션의 HTML입니다. 이 페이지에서 주요 뉴스 기사 30개를 추출해주세요.
 
 각 뉴스 기사에 대해 다음 정보를 JSON 배열 형식으로 반환해주세요:
 - id: 순번 (1부터 시작)
@@ -79,7 +79,7 @@ export async function fetchNewsWithGemini(): Promise<NewsItem[]> {
 [{"id": "1", "category": "${topic}", "title": "...", "summary": "...", "source": "...", "publishedAt": "${dateStr}", "reporter": "..."}]
 
 HTML:
-${html.substring(0, 50000)}`,
+${html.substring(0, 80000)}`,
                 },
               ],
             },
@@ -114,7 +114,7 @@ ${html.substring(0, 50000)}`,
     const newsData: NewsItem[] = JSON.parse(jsonStr)
 
     // 데이터 검증 및 정리
-    const validatedNews = newsData.slice(0, 15).map((item, index) => ({
+    const validatedNews = newsData.slice(0, 30).map((item, index) => ({
       id: String(index + 1),
       category: item.category || topic,
       title: item.title?.substring(0, 50) || "제목 없음",
