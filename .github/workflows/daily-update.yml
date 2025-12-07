@@ -6,30 +6,31 @@ on:
     - cron: '0 12 * * *'
   workflow_dispatch: # 수동 실행 가능
 
+env:
+  # 여기에 배포된 사이트 URL 입력
+  SITE_URL: https://ai-daily-content-design.vercel.app
+
 jobs:
   update-content:
     runs-on: ubuntu-latest
     steps:
       - name: Update News
         run: |
-          curl -X GET "${{ secrets.SITE_URL }}/api/cron/update-news" \
-            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+          curl -X GET "${{ env.SITE_URL }}/api/cron/update-news" \
             -H "Content-Type: application/json" \
             --fail --silent --show-error
         continue-on-error: true
 
       - name: Update Fortune
         run: |
-          curl -X GET "${{ secrets.SITE_URL }}/api/cron/update-fortune" \
-            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+          curl -X GET "${{ env.SITE_URL }}/api/cron/update-fortune" \
             -H "Content-Type: application/json" \
             --fail --silent --show-error
         continue-on-error: true
 
       - name: Update Stock
         run: |
-          curl -X GET "${{ secrets.SITE_URL }}/api/cron/update-stock" \
-            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+          curl -X GET "${{ env.SITE_URL }}/api/cron/update-stock" \
             -H "Content-Type: application/json" \
             --fail --silent --show-error
         continue-on-error: true
