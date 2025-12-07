@@ -1,0 +1,38 @@
+name: Daily Content Update
+
+on:
+  schedule:
+    # 매일 KST 오후 9시 (UTC 12:00)
+    - cron: '0 12 * * *'
+  workflow_dispatch: # 수동 실행 가능
+
+jobs:
+  update-content:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update News
+        run: |
+          curl -X GET "${{ secrets.SITE_URL }}/api/cron/update-news" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            --fail --silent --show-error
+        continue-on-error: true
+
+      - name: Update Fortune
+        run: |
+          curl -X GET "${{ secrets.SITE_URL }}/api/cron/update-fortune" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            --fail --silent --show-error
+        continue-on-error: true
+
+      - name: Update Stock
+        run: |
+          curl -X GET "${{ secrets.SITE_URL }}/api/cron/update-stock" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            --fail --silent --show-error
+        continue-on-error: true
+
+      - name: Log completion
+        run: echo "Daily update completed at $(date)"

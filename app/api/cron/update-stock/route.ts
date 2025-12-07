@@ -2,8 +2,8 @@ import { NextResponse } from "next/server"
 import { fetchStockData, getDefaultStockData } from "@/lib/stock-api"
 import { sendStockToExternalServer } from "@/lib/external-api"
 
-// Vercel Cron Job으로 매일 오후 9시(KST)에 실행
-// cron: "0 12 * * *" (UTC 12:00 = KST 21:00)
+// GitHub Actions로 매일 오후 9시(KST)에 실행
+// schedule: "0 12 * * *" (UTC 12:00 = KST 21:00)
 
 export async function GET(request: Request) {
   // Vercel Cron 인증 확인
