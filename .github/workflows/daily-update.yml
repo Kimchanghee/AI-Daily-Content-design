@@ -2,13 +2,13 @@ name: Daily Content Update
 
 on:
   schedule:
-    # 매일 KST 오후 9시 (UTC 12:00)
     - cron: '0 12 * * *'
-  workflow_dispatch: # 수동 실행 가능
-
-env:
-  # 여기에 배포된 사이트 URL 입력
-  SITE_URL: https://ai-daily-content-design.vercel.app
+  workflow_dispatch:
+    inputs:
+      site_url:
+        description: 'Site URL'
+        required: true
+        default: 'https://my-v0-project.vercel.app'
 
 jobs:
   update-content:
@@ -16,24 +16,21 @@ jobs:
     steps:
       - name: Update News
         run: |
-          curl -X GET "${{ env.SITE_URL }}/api/cron/update-news" \
-            -H "Content-Type: application/json" \
-            --fail --silent --show-error
-        continue-on-error: true
+          URL="${{ inputs.site_url || vars.SITE_URL || 'https://my-v0-project.vercel.app' }}"
+          echo "Calling: $URL/api/cron/update-news"
+          curl -s -X GET "$URL/api/cron/update-news" || true
 
       - name: Update Fortune
         run: |
-          curl -X GET "${{ env.SITE_URL }}/api/cron/update-fortune" \
-            -H "Content-Type: application/json" \
-            --fail --silent --show-error
-        continue-on-error: true
+          URL="${{ inputs.site_url || vars.SITE_URL || 'https://my-v0-project.vercel.app' }}"
+          echo "Calling: $URL/api/cron/update-fortune"
+          curl -s -X GET "$URL/api/cron/update-fortune" || true
 
       - name: Update Stock
         run: |
-          curl -X GET "${{ env.SITE_URL }}/api/cron/update-stock" \
-            -H "Content-Type: application/json" \
-            --fail --silent --show-error
-        continue-on-error: true
+          URL="${{ inputs.site_url || vars.SITE_URL || 'https://my-v0-project.vercel.app' }}"
+          echo "Calling: $URL/api/cron/update-stock"
+          curl -s -X GET "$URL/api/cron/update-stock" || true
 
-      - name: Log completion
-        run: echo "Daily update completed at $(date)"
+      - name: Done
+        run: echo "Completed"
