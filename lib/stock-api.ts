@@ -127,8 +127,7 @@ export function getDefaultStockData(): StockData {
 
   return {
     kospi: {
-      value: 2500,
-      change: 0,
+      value: 2518,      change: 0,
       changePercent: 0,
     },
       value: 724,      change: 0,
