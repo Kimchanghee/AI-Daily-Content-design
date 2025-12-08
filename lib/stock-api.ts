@@ -131,14 +131,11 @@ export function getDefaultStockData(): StockData {
       change: 0,
       changePercent: 0,
     },
-    kosdaq: {
-      value: 800,
-      change: 0,
+      value: 724,      change: 0,
       changePercent: 0,
     },
     exchange: {
-      usdKrw: 1400,
-      change: 0,
+        usdKrw: 1468,      change: 0,
     },
     updatedAt: dateStr,
   }
