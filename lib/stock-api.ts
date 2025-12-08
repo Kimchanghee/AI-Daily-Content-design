@@ -125,17 +125,20 @@ export function getDefaultStockData(): StockData {
   const koreaTime = new Date(today.toLocaleString("en-US", { timeZone: "Asia/Seoul" }))
   const dateStr = `${koreaTime.getFullYear()}.${String(koreaTime.getMonth() + 1).padStart(2, "0")}.${String(koreaTime.getDate()).padStart(2, "0")}`
 
-  return {
+    return {
     kospi: {
-      value: 2518,      change: 0,
+      value: 2518,
+      change: 0,
       changePercent: 0,
     },
-      value: 724,      change: 0,
+    kosdaq: {
+      value: 724,
+      change: 0,
       changePercent: 0,
     },
     exchange: {
-        usdKrw: 1468,      change: 0,
+      usdKrw: 1468,
+      change: 0,
     },
     updatedAt: dateStr,
   }
-}
