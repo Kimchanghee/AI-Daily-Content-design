@@ -2,8 +2,8 @@ name: Daily Content Update
 
 on:
   schedule:
-    - cron: '0 * * * *
-      workflow_dispatch:
+    - cron: '0 * * * *'
+  workflow_dispatch:
     inputs:
       site_url:
         description: 'Site URL'
@@ -19,18 +19,18 @@ jobs:
           URL="${{ inputs.site_url || vars.SITE_URL || 'https://my-v0-project.vercel.app' }}"
           echo "Calling: $URL/api/cron/update-news"
           curl -s -X GET "$URL/api/cron/update-news" || true
-
+      
       - name: Update Fortune
         run: |
           URL="${{ inputs.site_url || vars.SITE_URL || 'https://my-v0-project.vercel.app' }}"
           echo "Calling: $URL/api/cron/update-fortune"
           curl -s -X GET "$URL/api/cron/update-fortune" || true
-
+      
       - name: Update Stock
         run: |
           URL="${{ inputs.site_url || vars.SITE_URL || 'https://my-v0-project.vercel.app' }}"
           echo "Calling: $URL/api/cron/update-stock"
           curl -s -X GET "$URL/api/cron/update-stock" || true
-
+      
       - name: Done
         run: echo "Completed"
