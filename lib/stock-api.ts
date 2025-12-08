@@ -17,36 +17,27 @@ export interface StockData {
   updatedAt: string
 }
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY
-
-// Gemini API를 사용하여 구글 검색으로 증시/환율 데이터 가져오기
+// Gemini API를 사용하여 증시/환율 데이터 가져오기 (5번 재시도)
 export async function fetchStockData(): Promise<StockData> {
   const today = new Date()
   const koreaTime = new Date(today.toLocaleString("en-US", { timeZone: "Asia/Seoul" }))
   const dateStr = `${koreaTime.getFullYear()}.${String(koreaTime.getMonth() + 1).padStart(2, "0")}.${String(koreaTime.getDate()).padStart(2, "0")}`
 
-  if (!GEMINI_API_KEY) {
-    console.error("[Stock API] GEMINI_API_KEY not configured")
-    return getDefaultStockData()
-  }
+  const MAX_RETRIES = 5
 
-  try {
-    console.log(`[Stock API] Fetching stock data via Gemini for: ${dateStr}`)
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      console.log(`[Stock API] Fetching stock data via Gemini (attempt ${attempt}/${MAX_RETRIES})...`)
 
-    // Gemini API로 최신 증시/환율 정보 요청
-    const geminiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text: `오늘 ${dateStr} 기준 한국 증시와 환율 정보를 알려주세요.
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: `오늘 ${dateStr} 기준 한국 증시와 환율 정보를 알려주세요.
 
 다음 정보를 JSON 형식으로만 응답해주세요:
 1. KOSPI 지수 (현재가, 전일대비 변동폭, 변동률%)
@@ -60,86 +51,74 @@ export async function fetchStockData(): Promise<StockData> {
   "exchange": {"usdKrw": 1400.00, "change": 3.5}
 }
 
-참고: change가 양수면 상승, 음수면 하락입니다.`,
-                },
-              ],
+참고: change가 양수면 상승, 음수면 하락입니다.`
+              }]
+            }],
+            generationConfig: {
+              temperature: 0.1,
+              maxOutputTokens: 1024,
             },
-          ],
-          generationConfig: {
-            temperature: 0.1,
-            maxOutputTokens: 1024,
-          },
-        }),
+          })
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error(`Gemini API failed: ${response.status}`)
       }
-    )
 
-    if (!geminiResponse.ok) {
-      const errorText = await geminiResponse.text()
-      console.error("[Stock API] Gemini API error:", errorText)
-      throw new Error(`Gemini API error: ${geminiResponse.status}`)
+      const data = await response.json()
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || ""
+
+      console.log("[Stock API] Gemini response:", text.substring(0, 300))
+
+      // JSON 추출
+      let jsonStr = text
+      if (text.includes("```json")) {
+        jsonStr = text.split("```json")[1].split("```")[0].trim()
+      } else if (text.includes("```")) {
+        jsonStr = text.split("```")[1].split("```")[0].trim()
+      }
+
+      const jsonMatch = jsonStr.match(/\{[\s\S]*\}/)
+
+      if (!jsonMatch) {
+        throw new Error('No JSON found in response')
+      }
+
+      const stockData = JSON.parse(jsonMatch[0])
+
+      console.log(`[Stock API] Fetched via Gemini - KOSPI: ${stockData.kospi.value}, KOSDAQ: ${stockData.kosdaq.value}, USD/KRW: ${stockData.exchange.usdKrw}`)
+
+      return {
+        kospi: {
+          value: stockData.kospi.value,
+          change: stockData.kospi.change,
+          changePercent: stockData.kospi.changePercent,
+        },
+        kosdaq: {
+          value: stockData.kosdaq.value,
+          change: stockData.kosdaq.change,
+          changePercent: stockData.kosdaq.changePercent,
+        },
+        exchange: {
+          usdKrw: stockData.exchange.usdKrw,
+          change: stockData.exchange.change,
+        },
+        updatedAt: dateStr,
+      }
+
+    } catch (error) {
+      console.error(`[Stock API] Attempt ${attempt} failed:`, error)
+
+      if (attempt === MAX_RETRIES) {
+        throw new Error(`Failed to fetch stock data after ${MAX_RETRIES} attempts: ${error}`)
+      }
+
+      // 재시도 전 대기 (1초 * 시도 횟수)
+      await new Promise(resolve => setTimeout(resolve, attempt * 1000))
     }
-
-    const geminiData = await geminiResponse.json()
-    const responseText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || ""
-
-    console.log("[Stock API] Gemini response:", responseText.substring(0, 300))
-
-    // JSON 추출
-    let jsonStr = responseText
-    if (responseText.includes("```json")) {
-      jsonStr = responseText.split("```json")[1].split("```")[0].trim()
-    } else if (responseText.includes("```")) {
-      jsonStr = responseText.split("```")[1].split("```")[0].trim()
-    }
-
-    const stockData = JSON.parse(jsonStr)
-
-    console.log(`[Stock API] Fetched via Gemini - KOSPI: ${stockData.kospi.value}, KOSDAQ: ${stockData.kosdaq.value}, USD/KRW: ${stockData.exchange.usdKrw}`)
-
-    return {
-      kospi: {
-        value: stockData.kospi.value,
-        change: stockData.kospi.change,
-        changePercent: stockData.kospi.changePercent,
-      },
-      kosdaq: {
-        value: stockData.kosdaq.value,
-        change: stockData.kosdaq.change,
-        changePercent: stockData.kosdaq.changePercent,
-      },
-      exchange: {
-        usdKrw: stockData.exchange.usdKrw,
-        change: stockData.exchange.change,
-      },
-      updatedAt: dateStr,
-    }
-  } catch (error) {
-    console.error("[Stock API] Error fetching stock data:", error)
-    return getDefaultStockData()
   }
+
+  // TypeScript를 위한 unreachable code (실제로는 도달하지 않음)
+  throw new Error('Unexpected error in fetchStockData')
 }
-
-// 기본 증시/환율 데이터
-export function getDefaultStockData(): StockData {
-  const today = new Date()
-  const koreaTime = new Date(today.toLocaleString("en-US", { timeZone: "Asia/Seoul" }))
-  const dateStr = `${koreaTime.getFullYear()}.${String(koreaTime.getMonth() + 1).padStart(2, "0")}.${String(koreaTime.getDate()).padStart(2, "0")}`
-
-    return {
-    kospi: {
-      value: 2518,
-      change: 0,
-      changePercent: 0,
-    },
-    kosdaq: {
-      value: 724,
-      change: 0,
-      changePercent: 0,
-    },
-    exchange: {
-      usdKrw: 1468,
-      change: 0,
-    },
-    updatedAt: dateStr,
-  }
-  }
