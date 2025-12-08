@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { fetchNewsWithGemini, getTodayTopic } from "@/lib/gemini"
-import { saveNewsData } from "@/lib/news-storage"
+// import { saveNewsData } from "@/lib/news-storage"
 import { sendNewsToExternalServer } from "@/lib/external-api"
 
 // GitHub Actions로 매일 오후 9시(KST)에 실행
@@ -16,8 +16,8 @@ export async function GET() {
     console.log(`[Cron] Successfully fetched ${newsData.length} news items`)
 
     // 로컬 저장
-    await saveNewsData(newsData, topic)
-    console.log(`[Cron] News saved locally`)
+        // await saveNewsData(newsData, topic)
+        // console.log(`[Cron] News saved locally`)
 
     // 외부 서버로 전송
     try {
