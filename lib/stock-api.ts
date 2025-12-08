@@ -142,3 +142,4 @@ export function getDefaultStockData(): StockData {
     },
     updatedAt: dateStr,
   }
+  }
